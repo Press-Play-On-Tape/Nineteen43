@@ -5,7 +5,7 @@
 #include "FixedPoints.h"
 #include "FixedPointsCommon.h"
 
-Plane::Plane(const uint16_t images) : Base(0, 0) {
+Plane::Plane(const uint8_t * const * images) : Base(0, 0) {
   
   _bitmaps = images;
 

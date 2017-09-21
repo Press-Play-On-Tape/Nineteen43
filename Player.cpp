@@ -5,7 +5,7 @@
 
 #define ROLL_DELAY  8
 
-Player::Player(const uint16_t images) : Plane(images) {
+Player::Player(const uint8_t * const * images) : Plane(images) {
 
   initGame();
 

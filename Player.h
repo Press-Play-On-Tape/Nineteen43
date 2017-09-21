@@ -11,7 +11,7 @@ class Player : public Plane {
   
   public:
    
-    Player(const uint16_t images);
+    Player(const uint8_t * const * images);
 
     void renderImage();
     void initGame();

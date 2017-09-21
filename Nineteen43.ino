@@ -14,6 +14,7 @@
 #include "FixedPointsCommon.h"
 
 #include "Images/Images_Enemy.h"
+#include "Images/Images_Boat.h"
 #include "Images/Images_Explosions.h"
 #include "Images/Images_Obstacles.h"
 #include "Images/Images_Player.h"
@@ -24,21 +25,21 @@
 Arduboy2 arduboy;
 ArduboyTones sound(arduboy.audio.enabled);
 
-const uint8_t* const missions[] =   { mission_00, mission_01, mission_02, mission_03, mission_04 };
-const uint8_t* const formations[] = { formation_00, formation_01, formation_02, formation_03, formation_04, formation_06, formation_05, 
-                                      formation_06, formation_07, formation_08, formation_09, formation_10, formation_11, formation_12, 
-                                      formation_13 };
-const uint8_t* const sequences[] =  { seq_00, seq_01, seq_02, seq_03 };
+const uint8_t* const missions[] =  { mission_00, mission_01, mission_02, mission_03, mission_04 };
+const int8_t* const formations[] = { formation_00, formation_01, formation_02, formation_03, formation_04, formation_06, formation_05, 
+                                     formation_06, formation_07, formation_08, formation_09, formation_10, formation_11, formation_12, 
+                                     formation_13 };
+const int8_t* const sequences[] =  { seq_00, seq_01, seq_02, seq_03 };
 
-Player player = { &player_images };
+Player player = { player_images };
 
 Enemy enemies[NUMBER_OF_ENEMIES] = {
-  { EnemyType::Zero, &enemy_zero_images },
-  { EnemyType::Zero, &enemy_zero_images },
-  { EnemyType::Zero, &enemy_zero_images },
-  { EnemyType::Zero, &enemy_zero_images },
-  { EnemyType::Zero, &enemy_zero_images },
-  { EnemyType::Zero, &enemy_zero_images },
+  { EnemyType::Zero, enemy_zero_images },
+  { EnemyType::Zero, enemy_zero_images },
+  { EnemyType::Zero, enemy_zero_images },
+  { EnemyType::Zero, enemy_zero_images },
+  { EnemyType::Zero, enemy_zero_images },
+  { EnemyType::Zero, enemy_zero_images },
 };
 
 Obstacle obstacle = { -20, 24, fuel, fuel_mask, 0, 0 };
@@ -760,19 +761,19 @@ void launchFormation(const int8_t *formation) {
     switch ((EnemyType)pgm_read_byte(&formation[enemyIdx])) {
 
       case EnemyType::Zero:
-        enemies[i] = { EnemyType::Zero, &enemy_zero_images };
+        enemies[i] = { EnemyType::Zero, enemy_zero_images };
         break;
 
       case EnemyType::ZeroHollow:
-        enemies[i] = { EnemyType::ZeroHollow, &enemy_zero_hollow_images };
+        enemies[i] = { EnemyType::ZeroHollow, enemy_zero_hollow_images };
         break;
 
       case EnemyType::Bomber:
-        enemies[i] = { EnemyType::Bomber, &enemy_medium_images };
+        enemies[i] = { EnemyType::Bomber, enemy_medium_images };
         break;
 
       case EnemyType::Boat:
-        enemies[i] = { EnemyType::Boat, &enemy_boat };
+        enemies[i] = { EnemyType::Boat, enemy_boat };
         enemies[i].setTurretDirection(Direction::SouthWest);
         break;
 

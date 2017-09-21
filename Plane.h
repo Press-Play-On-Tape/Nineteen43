@@ -11,7 +11,7 @@ class Plane : public Base {
 
   public:
 
-    Plane(const uint16_t images);
+    Plane(const uint8_t * const * images);
     
     const Rect getRect() const;
     const SQ7x8 getHealth() const;
@@ -24,7 +24,7 @@ class Plane : public Base {
   protected:
 
     SQ7x8 _health;
-    uint16_t _bitmaps;
+    const uint8_t * const * _bitmaps;
 
 };
 #endif

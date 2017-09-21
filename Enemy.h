@@ -2,7 +2,6 @@
 #define CAR_H
  
 #include "Sprites.h"
-#include "Arduino.h"
 #include "Enums.h"
 #include "Plane.h"
 
@@ -11,7 +10,7 @@ class Enemy : public Plane {
   public: 
 
     Enemy(const EnemyType type, 
-          const uint16_t images);
+          const uint8_t * const * images);
         
     const Rect getRect() const;
     void renderImage();
@@ -20,7 +19,7 @@ class Enemy : public Plane {
     const EnemyType getEnemyType() const;
     const Direction getDirection() const;
     const Direction getTurretDirection() const;
-    const uint8_t *getStartingPos() const;
+    const int8_t *getStartingPos() const;
     const int8_t getOffsetX() const;
     const int8_t getOffsetY() const;
     const uint8_t getDelayStart() const;
@@ -36,7 +35,7 @@ class Enemy : public Plane {
     void setEnemyType(const EnemyType value);
     void setDirection(const Direction value);
     void setTurretDirection(const Direction value);
-    void setStartingPos(const uint8_t *startingPos);
+    void setStartingPos(const int8_t *startingPos);
     void setOffsetX(const int8_t value);
     void setOffsetY(const int8_t value);
     void setDelayStart(const uint8_t value);
@@ -62,7 +61,7 @@ class Enemy : public Plane {
     bool _invertY;
     uint8_t _delayStart;
     int16_t _currentPos;
-    const uint8_t *_startingPos;
+    const int8_t *_startingPos;
 
     
     // Store the details of a 'repeat' step in a sequence ..

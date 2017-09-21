@@ -9,7 +9,7 @@
 #define SCREEN_OFFSET_Y 32.0
 
 Enemy::Enemy(const EnemyType type, 
-             const uint16_t images) : 
+             const uint8_t * const * images) : 
 
              Plane(images) {
 
@@ -77,13 +77,13 @@ void Enemy::setTurretDirection(const Direction value) {
 
 }
 
-const uint8_t *Enemy::getStartingPos() const {
+const int8_t *Enemy::getStartingPos() const {
 
   return _startingPos;
 
 }
 
-void Enemy::setStartingPos(const uint8_t *value) {
+void Enemy::setStartingPos(const int8_t *value) {
 
   _startingPos = value;
   _currentPos = 0;
@@ -200,24 +200,56 @@ void Enemy::renderImage() {
       
       const auto healthInt = _health.getInteger();
       const auto absHealthInt = abs(healthInt) * 2;
-      
-	    switch (healthInt) {
-  
-        case -1 ... 0:
-          Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + absHealthInt), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_MASK_OFFSET + absHealthInt), 0, 0);
-          break;
-          
-        case -3 ... -2:
-          Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + absHealthInt), 0);
-          break;
 
-        case -4:
-          Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + 6), 0);
-          _enabled = false;
-          break;
-        
-      }
+      /*
+      if (_type == EnemyType::Boat) {
+
+        switch (healthInt) {
+          
+          case -1 ... 0:
+            Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + absHealthInt), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_MASK_OFFSET + absHealthInt), 0, 0);
+            Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + absHealthInt), pgm_read_word_near(_bitmaps + IMAGES_MASK_OFFSET + absHealthInt), 0, 0);
+            break;
+            
+          case -3 ... -2:
+            Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + absHealthInt), 0);
+            Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + absHealthInt), pgm_read_word_near(_bitmaps + IMAGES_MASK_OFFSET + absHealthInt), 0, 0);
+            break;
+
+          case -4:
+            Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + 6), 0);
+            Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + (healthInt * 2)), pgm_read_word_near(_bitmaps + IMAGES_MASK_OFFSET + (healthInt * 2)), 0, 0);
+            break;
+
+          case -5:
+            Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + (healthInt * 2)), pgm_read_word_near(_bitmaps + IMAGES_MASK_OFFSET + (healthInt * 2)), 0, 0);
+            _enabled = false;
+            break;
+          
+        }
       
+      }
+      else {
+      */
+        switch (healthInt) {
+    
+          case -1 ... 0:
+            Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + absHealthInt), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_MASK_OFFSET + absHealthInt), 0, 0);
+            break;
+            
+          case -3 ... -2:
+            Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + absHealthInt), 0);
+            break;
+
+          case -4:
+            Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + 6), 0);
+            _enabled = false;
+            break;
+          
+        }
+      /*
+      }
+      */
 	  }
 	
     if (_explosionImage > 0) {
