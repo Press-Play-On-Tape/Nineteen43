@@ -20,11 +20,11 @@
 
 // Image array offsets ..
 
-#define IMAGES_MASK_OFFSET              16
-#define IMAGES_EXPLOSION_OFFSET         32
-#define IMAGES_EXPLOSION_MASK_OFFSET    40
-#define IMAGES_SHRINK_OFFSET            48
-#define IMAGES_SHRINK_MASK_OFFSET       56
+#define IMAGES_MASK_OFFSET              8
+#define IMAGES_EXPLOSION_OFFSET         16
+#define IMAGES_EXPLOSION_MASK_OFFSET    20
+#define IMAGES_SHRINK_OFFSET            24
+#define IMAGES_SHRINK_MASK_OFFSET       28
 
 
 // EEPROM settings for high score ..

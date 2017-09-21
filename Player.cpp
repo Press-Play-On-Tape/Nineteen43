@@ -1,6 +1,6 @@
+#include <Arduboy2.h>
+#include <Sprites.h>
 #include "Player.h"
-#include "Arduboy2.h"
-#include "Sprites.h"
 #include "Enums.h"
 
 #define ROLL_DELAY  8
@@ -182,27 +182,27 @@ void Player::renderImage() {
         _rollState = 0;
       }
 
-      Sprites::drawExternalMask(rollX, _y.getInteger(), pgm_read_word_near(_bitmaps + (roll * 2)), pgm_read_word_near(_bitmaps + IMAGES_MASK_OFFSET + (roll * 2)), 0, 0);
+      Sprites::drawExternalMask(rollX, _y.getInteger(), pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(roll) ]), pgm_read_word_near(&_bitmaps[IMAGES_MASK_OFFSET + (static_cast<uint8_t>(roll) )]), 0, 0);
 
     }
  
     if (_health <= 0) {
  
       _health = _health - 0.05;
-      const auto bitmap = (abs(_health.getInteger()) - 1) * 2;
-          
+      const auto bitmap = (abs(_health.getInteger()) - 1);
+      
       switch (_health.getInteger()) {
   
         case -2 ... -1:
-          Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + bitmap), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_MASK_OFFSET + bitmap), 0, 0);
+          Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + static_cast<uint8_t>(bitmap)]), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_MASK_OFFSET + static_cast<uint8_t>(bitmap)]), 0, 0);
           break;
           
         case -4 ... -3:
-          Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + bitmap), 0);
+          Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + static_cast<uint8_t>(bitmap)]), 0);
           break;
 
         case -5:
-          Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(_bitmaps + IMAGES_EXPLOSION_OFFSET + 6), 0);
+          Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + 3]), 0);
           break;
           
         case -10:
@@ -219,45 +219,45 @@ void Player::renderImage() {
 
       uint8_t fuelX = _x.getInteger();
       uint8_t absFuel = abs(_fuel.getInteger());
-      uint16_t bitmap = 0;
-      uint16_t mask = 0;
+      uint8_t bitmap = 0;
+      uint8_t mask = 0;
       
       switch (absFuel) {
    
         case 0:
           fuelX += 6;
-          bitmap = _bitmaps + 2;
-          mask = _bitmaps + IMAGES_MASK_OFFSET + 2;
+          bitmap = 1;
+          mask = IMAGES_MASK_OFFSET + 1;
           break;
           
         case 1:
           fuelX += 11;
-          bitmap = _bitmaps + 2;
-          mask = _bitmaps + IMAGES_MASK_OFFSET + 2;
+          bitmap = 1;
+          mask = IMAGES_MASK_OFFSET + 1;
           break;
 
         case 2:
           fuelX += 14;
-          bitmap = _bitmaps + 2;
-          mask = _bitmaps + IMAGES_MASK_OFFSET + 2;
+          bitmap = 1;
+          mask = IMAGES_MASK_OFFSET + 1;
           break;
      
         case 3:
           fuelX += 20;
-          bitmap = _bitmaps + 12;
-          mask = _bitmaps + IMAGES_MASK_OFFSET + 12;
+          bitmap = 6;
+          mask = IMAGES_MASK_OFFSET + 6;
           break;
 
         case 4 ... 7:
           fuelX += 22 + (-4 - _fuel.getInteger());
-          bitmap = _bitmaps + IMAGES_SHRINK_OFFSET + ((absFuel - 4) * 2);
-          mask = _bitmaps + IMAGES_SHRINK_MASK_OFFSET + ((absFuel - 4) * 2);
+          bitmap = IMAGES_SHRINK_OFFSET + (absFuel - 4);
+          mask = IMAGES_SHRINK_MASK_OFFSET + (absFuel - 4);
           break;
 
         case 8 ... 11:
           fuelX += 20;
-          bitmap = _bitmaps + IMAGES_EXPLOSION_OFFSET + ((absFuel - 8) * 2);
-          mask = _bitmaps + IMAGES_EXPLOSION_MASK_OFFSET + ((absFuel - 8) * 2);
+          bitmap = IMAGES_EXPLOSION_OFFSET + (absFuel - 8);
+          mask = IMAGES_EXPLOSION_MASK_OFFSET + (absFuel - 8);
           break;
           
         case 16:
@@ -267,7 +267,7 @@ void Player::renderImage() {
       }    
 
       if (bitmap != 0) {
-        Sprites::drawExternalMask(fuelX, _y.getInteger(), pgm_read_word_near(bitmap), pgm_read_word_near(mask), 0, 0);
+        Sprites::drawExternalMask(fuelX, _y.getInteger(), pgm_read_word_near(&_bitmaps[bitmap]), pgm_read_word_near(&_bitmaps[mask]), 0, 0);
       }
       
     }
