@@ -330,9 +330,9 @@ void game_loop() {
     
     // Handle player movement ..
   
-    if (arduboy.pressed(UP_BUTTON) && player.getY() > 0)                                                          { player.setY(player.getY() - PLAYER_MOVEMENT_INC_UP); }
+    if (arduboy.pressed(UP_BUTTON) && player.getY() > PLAYER_MOVEMENT_INC_UP)                                     { player.setY(player.getY() - PLAYER_MOVEMENT_INC_UP); }
     if (arduboy.pressed(DOWN_BUTTON) && player.getY() < HEIGHT - PLAYER_HEIGHT)                                   { player.setY(player.getY() + PLAYER_MOVEMENT_INC_DOWN); }
-    if (arduboy.pressed(LEFT_BUTTON) && player.getX() > 0)                                                        { player.setX(player.getX() - PLAYER_MOVEMENT_INC_LEFT); }
+    if (arduboy.pressed(LEFT_BUTTON) && player.getX() > PLAYER_MOVEMENT_INC_LEFT)                                 { player.setX(player.getX() - PLAYER_MOVEMENT_INC_LEFT); }
     if (arduboy.pressed(RIGHT_BUTTON) && player.getX() < WIDTH - PLAYER_WIDTH - SCOREBOARD_OUTER_RECT_WIDTH)      { player.decFuel(FUEL_DECREMENT_BOOST);
                                                                                                                     player.setX(player.getX() + PLAYER_MOVEMENT_INC_RIGHT); }
   
@@ -1110,7 +1110,7 @@ void checkCanEnemyShoot() {
 
         enemies[i].decNumberOfBulletsFired();
   
-        enemyBullets[enemyBulletIdx].setX(enemies[i].getX().getInteger() + (enemies[i].getEnemyType() == EnemyType::Boat ? ENEMY_BOAT_TURRENT_CENTER_X : (enemies[i].getWidth() / 2)));
+        enemyBullets[enemyBulletIdx].setX(enemies[i].getX().getInteger() + (enemies[i].getEnemyType() == EnemyType::Boat ? ENEMY_BOAT_TURRENT_X : (enemies[i].getWidth() / 2)));
         enemyBullets[enemyBulletIdx].setY(enemies[i].getY().getInteger() + (enemies[i].getEnemyType() == EnemyType::Boat ? ENEMY_BOAT_TURRENT_CENTER_Y : (enemies[i].getHeight() / 2)));
         enemyBullets[enemyBulletIdx].setDirection(enemies[i].getEnemyType() == EnemyType::Boat ? enemies[i].getTurretDirection() : enemies[i].getDirection());
         enemyBullets[enemyBulletIdx].setEnabled(true);

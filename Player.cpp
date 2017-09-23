@@ -27,7 +27,7 @@ void Player::initMission() {
   _score = 0;
   _rollState = 0;
   _enabled = true;
-  _x = 0;
+  _x = 1;
   _y = 24;
   
 }
@@ -175,10 +175,10 @@ void Player::renderImage() {
 
       }
 
-      if (roll > 0 && roll < 7) {
+      if (roll > 0 && roll < 8) {
         ++_rollState;
       }
-      else if (roll == 7) {
+      if (_rollState == 64) {
         _rollState = 0;
       }
 
