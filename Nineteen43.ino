@@ -10,8 +10,8 @@
 #include "Sequences.h"
 #include "Sounds.h"
 #include "Enums.h"
-#include "FixedPoints.h"
-#include "FixedPointsCommon.h"
+#include "src/FixedPoints/FixedPoints.h"
+#include "src/FixedPoints/FixedPointsCommon.h"
 
 #include "Images/Images_Enemy.h"
 #include "Images/Images_Boat.h"

@@ -1,8 +1,8 @@
 #ifndef ENUMS_H
 #define ENUMS_H
 
-#include "FixedPoints.h"
-#include "FixedPointsCommon.h"
+#include "src/FixedPoints/FixedPoints.h"
+#include "src/FixedPoints/FixedPointsCommon.h"
 #include <Arduboy2.h>
 
 
