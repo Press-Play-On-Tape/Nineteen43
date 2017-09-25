@@ -4,7 +4,7 @@
   "description": "A version of the classic '1943' for the Arduboy.",
   "author": "Filmote",
   "version": "1.0.0",
-  "date": "2017-09-30",
+  "date": "2017-09-25",
   "genre": "Action",
   "publisher": "Filmote",
   "idea": "Filmote",
@@ -22,28 +22,16 @@
       "filename": "screenshot00.png"
     },
     {
-      "title": "Selecting a bone from the player's hand.",
+      "title": "Credits.",
       "filename": "screenshot01.png"
     },
     {
-      "title": "Playing a bone on the board.",
+      "title": "Under Attack!",
       "filename": "screenshot02.png"
     },
     {
-      "title": "Selecting a bone from the graveyard.",
+      "title": "All Missions Compete.",
       "filename": "screenshot03.png"
-    },
-    {
-      "title": "Computer's turn .. waiting.",
-      "filename": "screenshot04.png"
-    },
-    {
-      "title": "Computer's turn .. decision made.",
-      "filename": "screenshot05.png"
-    },
-    {
-      "title": "Playing all four sides of the spinner.",
-      "filename": "screenshot06.png"
     }
   ],
   "binaries": [
