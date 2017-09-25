@@ -62,7 +62,7 @@ uint8_t mission_formations_left = 0;             // Number of formations left wi
 uint8_t formation = 0;
 uint8_t gameState = STATE_INTRO_INIT;
 int16_t intro;
-uint8_t frameRate = 60;
+uint8_t frameRate = 50;
 
 
 /* -----------------------------------------------------------------------------------------------------------------------------
@@ -77,7 +77,8 @@ void setup() {
   arduboy.flashlight(); 
   arduboy.systemButtons();  
   arduboy.audio.begin();
-    
+  
+  frameRate = INIT_FRAME_RATE;
   arduboy.setFrameRate(frameRate);
   arduboy.initRandomSeed();
 
@@ -145,6 +146,9 @@ void intro_init() {
   gameState = STATE_INTRO_LOOP;
   sound.tones(score);
   player.initGame();
+
+  frameRate = INIT_FRAME_RATE;
+  arduboy.setFrameRate(frameRate);
 
 }
 
@@ -284,6 +288,9 @@ void game_init() {
   sound.tones(mission_start);
   intro = 80;
   gameState = STATE_GAME_LOOP;
+
+  frameRate = INIT_FRAME_RATE;
+  arduboy.setFrameRate(frameRate);
 
 }
 

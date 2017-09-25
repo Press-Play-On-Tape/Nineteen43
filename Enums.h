@@ -34,7 +34,6 @@
 #define EEPROM_SCORE                    EEPROM_START_C1 + 2
 
 #define MISSION_COUNT                   25
-#define FORMATIONS_COUNT                7
 #define NUMBER_OF_ENEMIES               6
 
 #define BULLETS_MAX                     75
@@ -102,6 +101,7 @@
 #define SCOREBOARD_BULLET_PU_X          SCOREBOARD_KILLS_X
 #define SCOREBOARD_BULLET_PU_Y          24
 
+#define INIT_FRAME_RATE                 50
 
 // Used to determine if the enemy is aiming at the player ..
 
