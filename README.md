@@ -4,7 +4,7 @@ A version of the classic WWII game 1943: The Battle of Midway
 
 # Game Play
 
-Destroy the enemy Zeroes and Bombers.  Zeros with solid wings will die on one shot, others will take multiple hits before they die.  Watch your fuel, your health and ammunition - replenish these by running over the poer ups!
+Destroy the enemy Zeroes and Bombers.  Zeros with solid wings will die on one shot, others will take multiple hits before they die.  Watch your fuel, your health and ammunition - replenish these by running over the power ups!
 
 ![Pipes](https://github.com/filmote/Nineteen43/blob/master/Artwork/screenshot00.png) 
 ![Pipes](https://github.com/filmote/Nineteen43/blob/master/Artwork/screenshot01.png) 
