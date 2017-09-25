@@ -79,5 +79,3 @@ const uint16_t hit_by_bullets[] PROGMEM = {
   NOTE_A3, 6, NOTE_REST,3, NOTE_D3,7, NOTE_REST,5, NOTE_C3,6, NOTE_REST,2, NOTE_F3,8, 
   TONES_END
 };
-
-

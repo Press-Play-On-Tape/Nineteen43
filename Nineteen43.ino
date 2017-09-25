@@ -467,9 +467,12 @@ void game_loop() {
 
   // End of life or mission?
 
+  if ((player.getHealth() <= 0 || player.getFuel() <= 0) && !sound.playing()) {
+    sound.tones(mission_failure);    
+  }
+  
   if (!player.getEnabled()) {
     player.setGrandScore(player.getGrandScore() + player.getScore());
-    sound.tones(mission_failure);    
     gameState = STATE_GAME_END_OF_CAMPAIGN;
   }
 
@@ -566,7 +569,7 @@ void end_of_game() {
   uint16_t playerScore = player.getGrandScore();
   
   arduboy.clear();
-  arduboy.fillRect(-1, 0, WIDTH, HEIGHT, WHITE);  
+  arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
   Sprites::drawOverwrite(0, 0, p38_3d, 0);
 
   if (!sound.playing()) sound.tones(mission_success);
@@ -590,16 +593,16 @@ void end_of_game() {
     uint16_t high = EEPROMReadInt(EEPROM_SCORE);
     if (playerScore > high) EEPROMWriteInt(EEPROM_SCORE, playerScore);
 
-    arduboy.setCursor(75, 40);
+    arduboy.setCursor(76, 40);
     arduboy.print(F("Score"));
-    arduboy.setCursor(108, 40);
+    arduboy.setCursor(109, 40);
     if (playerScore < 100) arduboy.print("0");
     if (playerScore < 10)  arduboy.print("0");
     arduboy.print(playerScore);
     
-    arduboy.setCursor(75, 52);
+    arduboy.setCursor(76, 52);
     arduboy.print(F("High"));
-    arduboy.setCursor(108, 52);
+    arduboy.setCursor(109, 52);
     if (high < 100) arduboy.print("0");
     if (high < 10)  arduboy.print("0");
     arduboy.print(high);

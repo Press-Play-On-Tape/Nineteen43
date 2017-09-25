@@ -37,7 +37,6 @@
 #define NUMBER_OF_ENEMIES               6
 
 #define BULLETS_MAX                     75
-
 #define HEALTH_MAX                      14
 #define POWER_UP_MAX                    10
 
