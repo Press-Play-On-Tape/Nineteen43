@@ -434,7 +434,7 @@ void game_loop() {
 
       if (mission_formations_left > 0) {
   
-        launchMission_NextFormation(missions[mission]);
+        launchMission_NextFormation(missions[mission % 5]);
   
       }
       else {
