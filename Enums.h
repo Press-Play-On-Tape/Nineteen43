@@ -50,9 +50,9 @@
 #define OBSTACLE_LAUNCH_DELAY_INC_L2    10
 #define OBSTACLE_WIDTH                  8
 
-#define FRAME_RATE_INC_L0               0
-#define FRAME_RATE_INC_L1               1
-#define FRAME_RATE_INC_L2               2
+#define FRAME_RATE_INC_L0               1
+#define FRAME_RATE_INC_L1               2
+#define FRAME_RATE_INC_L2               3
 #define INIT_FRAME_RATE                 50
 
 #define PLAYER_MOVEMENT_INC_UP          0.80
