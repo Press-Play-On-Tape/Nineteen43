@@ -482,7 +482,7 @@ void game_loop() {
         intro = 40;
         sound.tones(mission_success);
         renderEndOfMission();
-        gameState = STATE_GAME_END_OF_GAME;
+        gameState = STATE_GAME_END_OF_CAMPAIGN;
         
       }
   
@@ -601,6 +601,7 @@ void end_of_game() {
   if (intro == 0) {
 
     uint16_t high = EEPROMReadInt(EEPROM_SCORE);
+    
     if (playerScore > high) {
       EEPROMWriteInt(EEPROM_SCORE, playerScore);
       high = playerScore;
@@ -610,6 +611,7 @@ void end_of_game() {
       arduboy.setCursor(74, 40);
       arduboy.print(F("Scor"));
       arduboy.setCursor(102, 40);
+      if (playerScore < 1000) arduboy.print("0");
     }
 
     else {
