@@ -79,7 +79,7 @@ uint16_t obstacleLaunchDelayMax = OBSTACLE_LAUNCH_DELAY_MAX;
  */
 void setup() {
 
-  initEEPROM();
+  initEEPROM(false);
   arduboy.boot();
   arduboy.blank();  
   arduboy.flashlight(); 
@@ -635,7 +635,7 @@ void end_of_game() {
 
   delay(50);
 
-  if (arduboy.justPressed(A_BUTTON + B_BUTTON)) initEEPROM();
+  if (arduboy.justPressed(UP_BUTTON)) { initEEPROM(true); player.setGrandScore(0); }
   if (arduboy.justPressed(A_BUTTON)) gameState = STATE_INTRO_INIT;
 
 }
@@ -1372,12 +1372,12 @@ void drawHorizontalDottedLine(uint8_t x1, uint8_t x2, uint8_t y, uint8_t color) 
  *   it resets the settings ..
  * ----------------------------------------------------------------------------
  */
-void initEEPROM() {
+void initEEPROM(bool forceOverwrite) {
 
   uint8_t c1 = EEPROM.read(EEPROM_START_C1);
   uint8_t c2 = EEPROM.read(EEPROM_START_C2);
 
-  if (c1 != 52 || c2 != 51) { 
+  if (c1 != 52 || c2 != 51 || forceOverwrite) { 
   
     EEPROM.update(EEPROM_START_C1, 52);
     EEPROM.update(EEPROM_START_C2, 51);
