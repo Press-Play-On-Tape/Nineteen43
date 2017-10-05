@@ -30,10 +30,10 @@ const int8_t* const formations[] = { formation_00, formation_01, formation_02, f
                                      formation_06, formation_07, formation_08, formation_09, formation_10, formation_11, formation_12, 
                                      formation_13 };
 const int8_t* const sequences[] =  { seq_00, seq_01, seq_02, seq_03 };
-const int8_t* const levels[] =     { level_00, level_01, level_02 };
 
-const int8_t* const obstacleLaunchDelayInc[] =  { OBSTACLE_LAUNCH_DELAY_INC_L0, OBSTACLE_LAUNCH_DELAY_INC_L1, OBSTACLE_LAUNCH_DELAY_INC_L2 };
-const int8_t* const frameRateInc[] =            { FRAME_RATE_INC_L0, FRAME_RATE_INC_L1, FRAME_RATE_INC_L2 };
+const uint8_t* const levels[] =    { level_00, level_01, level_02 };
+const int8_t obstacleLaunchDelayInc[] =  { OBSTACLE_LAUNCH_DELAY_INC_L0, OBSTACLE_LAUNCH_DELAY_INC_L1, OBSTACLE_LAUNCH_DELAY_INC_L2 };
+const int8_t frameRateInc[] =            { FRAME_RATE_INC_L0, FRAME_RATE_INC_L1, FRAME_RATE_INC_L2 };
 
 Player player = { player_images };
 
@@ -238,9 +238,9 @@ void intro_loop() {
 
   if (showLevel) {
 
-    arduboy.fillRect(64, 50, 64, 14, BLACK);
-    Sprites::drawOverwrite(64, 50, level_select, 0);
-    Sprites::drawOverwrite(115, 50, levels[level], 0);
+    arduboy.fillRect(71, 50, 64, 14, BLACK);
+    Sprites::drawOverwrite(71, 50, level_select, 0);
+    Sprites::drawOverwrite(103, 50, levels[level], 0);
     
   }
 
@@ -263,12 +263,12 @@ void intro_loop() {
 
   if (arduboy.justPressed(DOWN_BUTTON)) {
 
-    if (level > 1) level--;
+    if (level > 0) level--;
     showLevel = true;
 
   }
 
-  if (arduboy.justPressed(LEFT_BUTTON || RIGHT_BUTTON)) {
+  if (arduboy.justPressed(LEFT_BUTTON + RIGHT_BUTTON)) {
 
     gameState = STATE_CREDITS_INIT;   
 
@@ -630,27 +630,30 @@ void end_of_game() {
   if (intro == 0) {
 
     uint16_t high = EEPROMReadInt(EEPROM_SCORE);
-    if (playerScore > high) EEPROMWriteInt(EEPROM_SCORE, playerScore);
+    if (playerScore > high) {
+      EEPROMWriteInt(EEPROM_SCORE, playerScore);
+      high = playerScore;
+    }
 
     if (playerScore > 999 || high > 999) {
-      arduboy.setCursor(72, 40);
+      arduboy.setCursor(74, 40);
       arduboy.print(F("Scor"));
+      arduboy.setCursor(102, 40);
     }
+
     else {
       arduboy.setCursor(76, 40);
       arduboy.print(F("Score"));
+      arduboy.setCursor(109, 40);
     }
         
-    arduboy.setCursor(109, 40);
-    if (playerScore < 1000) arduboy.print("0");
     if (playerScore < 100) arduboy.print("0");
     if (playerScore < 10)  arduboy.print("0");
     arduboy.print(playerScore);
     
     arduboy.setCursor((playerScore > 999 || high > 999 ? 72 : 76), 52);
     arduboy.print(F("High"));
-    arduboy.setCursor(109, 52);
-    if (high < 1000) arduboy.print("0");
+    arduboy.setCursor((playerScore > 999 || high > 999 ? 102 : 109), 52);
     if (high < 100) arduboy.print("0");
     if (high < 10)  arduboy.print("0");
     arduboy.print(high);
@@ -1420,8 +1423,8 @@ void EEPROMWriteInt(int address, int value) {
   uint8_t lowByte = ((value >> 0) & 0xFF);
   uint8_t highByte = ((value >> 8) & 0xFF);
   
-  EEPROM.write(address, lowByte);
-  EEPROM.write(address + 1, highByte);
+  EEPROM.write(address + (level * 2), lowByte);
+  EEPROM.write(address + (level * 2) + 1, highByte);
 
 }
 
@@ -1432,8 +1435,8 @@ void EEPROMWriteInt(int address, int value) {
  */
 uint16_t EEPROMReadInt(int address) {
   
-  uint8_t lowByte = EEPROM.read(address);
-  uint8_t highByte = EEPROM.read(address + 1);
+  uint8_t lowByte = EEPROM.read(address + (level * 2));
+  uint8_t highByte = EEPROM.read(address+  (level * 2) + 1);
   
   return ((lowByte << 0) & 0xFF) + ((highByte << 8) & 0xFF00);
 
