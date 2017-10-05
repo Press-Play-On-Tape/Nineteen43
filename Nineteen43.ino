@@ -25,13 +25,13 @@
 Arduboy2 arduboy;
 ArduboyTones sound(arduboy.audio.enabled);
 
-const uint8_t* const missions[] =  { mission_00, mission_01, mission_02, mission_03, mission_04 };
-const int8_t* const formations[] = { formation_00, formation_01, formation_02, formation_03, formation_04, formation_06, formation_05, 
-                                     formation_06, formation_07, formation_08, formation_09, formation_10, formation_11, formation_12, 
-                                     formation_13 };
-const int8_t* const sequences[] =  { seq_00, seq_01, seq_02, seq_03 };
+const uint8_t* const missions[] =        { mission_00, mission_01, mission_02, mission_03, mission_04 };
+const int8_t* const formations[] =       { formation_00, formation_01, formation_02, formation_03, formation_04, formation_06, formation_05, 
+                                           formation_06, formation_07, formation_08, formation_09, formation_10, formation_11, formation_12, 
+                                           formation_13 };
+const int8_t* const sequences[] =        { seq_00, seq_01, seq_02, seq_03 };
 
-const uint8_t* const levels[] =    { level_00, level_01, level_02 };
+const uint8_t* const levels[] =          { level_00, level_01, level_02 };
 const int8_t obstacleLaunchDelayInc[] =  { OBSTACLE_LAUNCH_DELAY_INC_L0, OBSTACLE_LAUNCH_DELAY_INC_L1, OBSTACLE_LAUNCH_DELAY_INC_L2 };
 const int8_t frameRateInc[] =            { FRAME_RATE_INC_L0, FRAME_RATE_INC_L1, FRAME_RATE_INC_L2 };
 
