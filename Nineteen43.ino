@@ -83,7 +83,6 @@ void setup() {
   arduboy.boot();
   arduboy.blank();  
   arduboy.flashlight(); 
-  arduboy.systemButtons();  
   arduboy.audio.begin();
   
   obstacleLaunchDelayMin = OBSTACLE_LAUNCH_DELAY_MIN;
@@ -673,10 +672,13 @@ void launchObstacle() {
   const uint8_t *bitmap = nullptr;
   const uint8_t *mask = nullptr;
 
-  if (player.getFuel() <= 4) {
+
+  // For the easier levels, priotise fuel and health if the player needs it !
+  
+  if (level < 2 && player.getFuel() <= 4) {
     type = ObstacleType::Fuel;
   }
-  else if (player.getHealth() <= 4) {
+  else if (level < 2 && player.getHealth() <= 4) {
     type = ObstacleType::Health;
   }
   else {
@@ -783,8 +785,7 @@ void launchFormation(const int8_t *formation) {
   // Disable all enemies ..
 
   for (uint8_t i = 0; i < NUMBER_OF_ENEMIES; ++i) {
-//
-enemies[i].setX(-32);
+  //enemies[i].setX(-32);
     enemies[i].setEnabled(false);
   }
 
