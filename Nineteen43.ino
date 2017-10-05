@@ -195,7 +195,7 @@ void credits_loop() {
     gameState = STATE_INTRO_INIT;
     
     arduboy.fillRect(i - 2, 5, 255, 20, BLACK);
-    Sprites::drawOverwrite(i+  48, 0, zero_E, 0);
+    Sprites::drawOverwrite(i + 48, 0, zero_E, 0);
     Sprites::drawOverwrite(i + 30, 18, zero_E, 0);
     Sprites::drawOverwrite(i , 5, p38_0, 0);
     
@@ -287,15 +287,15 @@ void intro_loop() {
     if (arduboy.audio.enabled()) {
   
       arduboy.audio.off(); 
-      arduboy.audio.saveOnOff();
   
     }
     else {
   
       arduboy.audio.on(); 
-      arduboy.audio.saveOnOff();
   
     }
+
+    arduboy.audio.saveOnOff();
 
   }
   
@@ -358,7 +358,7 @@ void game_loop() {
       break;
 
     case 1:
-      launchMission_FirstFormation(missions[mission % 5]);
+      launchMission_FirstFormation(missions[mission % NUMBER_OF_MISSIONS]);
       intro--;
       break;
 
@@ -471,7 +471,7 @@ void game_loop() {
 
       if (mission_formations_left > 0) {
   
-        launchMission_NextFormation(missions[mission % 5]);
+        launchMission_NextFormation(missions[mission % NUMBER_OF_MISSIONS]);
   
       }
       else {
@@ -514,6 +514,7 @@ void end_of_mission() {
   uint16_t missionScore = player.getScore();
   uint16_t grandScore = player.getGrandScore();
   uint16_t high = EEPROMReadInt(EEPROM_SCORE);
+  
   if (grandScore > high) EEPROMWriteInt(EEPROM_SCORE, grandScore);
 
 
@@ -539,15 +540,13 @@ void end_of_mission() {
 
 
   arduboy.setCursor(14, 28);
-  arduboy.print(F("Mission Score"));
-  arduboy.setCursor(97, 28);
+  arduboy.print(F("Mission Score "));
   if (missionScore < 100) arduboy.print("0");
   if (missionScore < 10)  arduboy.print("0");
   arduboy.print(missionScore);
 
-  arduboy.setCursor(14, 40);
-  arduboy.print(F("Total Score"));
-  arduboy.setCursor(97, 40);
+  arduboy.setCursor(18, 40);
+  arduboy.print(F("Total Score "));
   if (grandScore < 100) arduboy.print("0");
   if (grandScore < 10)  arduboy.print("0");
   arduboy.print(grandScore);
@@ -580,7 +579,6 @@ void end_of_game() {
   if (intro > 0) --intro;
   uint16_t playerScore = player.getGrandScore();
   
-  arduboy.clear();
   arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
   Sprites::drawOverwrite((playerScore > 999 ? -3 : 0), 0, p38_3d, 0);
 
@@ -636,6 +634,8 @@ void end_of_game() {
   arduboy.display();
 
   delay(50);
+
+  if (arduboy.justPressed(A_BUTTON + B_BUTTON)) initEEPROM();
   if (arduboy.justPressed(A_BUTTON)) gameState = STATE_INTRO_INIT;
 
 }
@@ -783,7 +783,8 @@ void launchFormation(const int8_t *formation) {
   // Disable all enemies ..
 
   for (uint8_t i = 0; i < NUMBER_OF_ENEMIES; ++i) {
-    enemies[i].setX(-32);
+//
+enemies[i].setX(-32);
     enemies[i].setEnabled(false);
   }
 
@@ -1411,7 +1412,7 @@ void EEPROMWriteInt(int address, int value) {
 uint16_t EEPROMReadInt(int address) {
   
   uint8_t lowByte = EEPROM.read(address + (level * 2));
-  uint8_t highByte = EEPROM.read(address+  (level * 2) + 1);
+  uint8_t highByte = EEPROM.read(address +  (level * 2) + 1);
   
   return ((lowByte << 0) & 0xFF) + ((highByte << 8) & 0xFF00);
 

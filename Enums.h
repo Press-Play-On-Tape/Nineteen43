@@ -34,6 +34,7 @@
 #define EEPROM_SCORE                    EEPROM_START_C1 + 2
 
 #define NUMBER_OF_ENEMIES               6
+#define NUMBER_OF_MISSIONS              5
 
 #define BULLETS_MAX                     75
 #define HEALTH_MAX                      14
