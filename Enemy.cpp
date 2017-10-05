@@ -1,8 +1,8 @@
 #include "Enemy.h"
 #include "Sprites.h"
 #include "Enums.h"
-#include "src/FixedPoints/FixedPoints.h"
-#include "src/FixedPoints/FixedPointsCommon.h"
+#include "FixedPoints.h"
+#include "FixedPointsCommon.h"
 #include "Sequences.h"
 
 #define SCREEN_OFFSET_X 64.0

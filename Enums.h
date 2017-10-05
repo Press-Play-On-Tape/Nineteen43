@@ -1,8 +1,8 @@
 #ifndef ENUMS_H
 #define ENUMS_H
 
-#include "src/FixedPoints/FixedPoints.h"
-#include "src/FixedPoints/FixedPointsCommon.h"
+#include "FixedPoints.h"
+#include "FixedPointsCommon.h"
 #include <Arduboy2.h>
 
 
@@ -33,7 +33,6 @@
 #define EEPROM_START_C2                 EEPROM_START_C1 + 1
 #define EEPROM_SCORE                    EEPROM_START_C1 + 2
 
-#define MISSION_COUNT                   25
 #define NUMBER_OF_ENEMIES               6
 
 #define BULLETS_MAX                     75
@@ -46,7 +45,15 @@
 
 #define OBSTACLE_LAUNCH_DELAY_MAX       300
 #define OBSTACLE_LAUNCH_DELAY_MIN       125
+#define OBSTACLE_LAUNCH_DELAY_INC_L0    0
+#define OBSTACLE_LAUNCH_DELAY_INC_L1    5
+#define OBSTACLE_LAUNCH_DELAY_INC_L2    10
 #define OBSTACLE_WIDTH                  8
+
+#define FRAME_RATE_INC_L0               0
+#define FRAME_RATE_INC_L1               1
+#define FRAME_RATE_INC_L2               2
+#define INIT_FRAME_RATE                 50
 
 #define PLAYER_MOVEMENT_INC_UP          0.80
 #define PLAYER_MOVEMENT_INC_DOWN        0.80
@@ -100,7 +107,6 @@
 #define SCOREBOARD_BULLET_PU_X          SCOREBOARD_KILLS_X
 #define SCOREBOARD_BULLET_PU_Y          24
 
-#define INIT_FRAME_RATE                 50
 
 // Used to determine if the enemy is aiming at the player ..
 

@@ -1,8 +1,8 @@
 #ifndef BASE_H
 #define BASE_H
 
-#include "src/FixedPoints/FixedPoints.h"
-#include "src/FixedPoints/FixedPointsCommon.h"
+#include "FixedPoints.h"
+#include "FixedPointsCommon.h"
 
 class Base {
 

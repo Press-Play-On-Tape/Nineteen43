@@ -4,8 +4,8 @@
 #include "Sprites.h"
 #include "Base.h"
 #include "Enums.h"
-#include "src/FixedPoints/FixedPoints.h"
-#include "src/FixedPoints/FixedPointsCommon.h"
+#include "FixedPoints.h"
+#include "FixedPointsCommon.h"
 
 class Plane : public Base {
 

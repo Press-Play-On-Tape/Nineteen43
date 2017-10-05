@@ -1,6 +1,6 @@
 #include "Base.h"
-#include "src/FixedPoints/FixedPoints.h"
-#include "src/FixedPoints/FixedPointsCommon.h"
+#include "FixedPoints.h"
+#include "FixedPointsCommon.h"
 
 Base::Base(SQ15x16 x, SQ15x16 y) {
 

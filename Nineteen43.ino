@@ -10,8 +10,8 @@
 #include "Sequences.h"
 #include "Sounds.h"
 #include "Enums.h"
-#include "src/FixedPoints/FixedPoints.h"
-#include "src/FixedPoints/FixedPointsCommon.h"
+#include "FixedPoints.h"
+#include "FixedPointsCommon.h"
 
 #include "Images/Images_Enemy.h"
 #include "Images/Images_Boat.h"
@@ -30,6 +30,10 @@ const int8_t* const formations[] = { formation_00, formation_01, formation_02, f
                                      formation_06, formation_07, formation_08, formation_09, formation_10, formation_11, formation_12, 
                                      formation_13 };
 const int8_t* const sequences[] =  { seq_00, seq_01, seq_02, seq_03 };
+const int8_t* const levels[] =     { level_00, level_01, level_02 };
+
+const int8_t* const obstacleLaunchDelayInc[] =  { OBSTACLE_LAUNCH_DELAY_INC_L0, OBSTACLE_LAUNCH_DELAY_INC_L1, OBSTACLE_LAUNCH_DELAY_INC_L2 };
+const int8_t* const frameRateInc[] =            { FRAME_RATE_INC_L0, FRAME_RATE_INC_L1, FRAME_RATE_INC_L2 };
 
 Player player = { player_images };
 
@@ -54,6 +58,8 @@ const uint8_t scrollIncrement = 2;
 
 uint16_t obstacleLaunchCountdown = OBSTACLE_LAUNCH_DELAY_MIN;
 uint8_t enemyShotCountdown = 5;
+uint8_t level = 0;
+bool showLevel = false;
 
 uint8_t mission = 0;                             // Mission currently being played
 uint8_t missionIdx = 0;                          // Byte index within current mission
@@ -62,7 +68,9 @@ uint8_t mission_formations_left = 0;             // Number of formations left wi
 uint8_t formation = 0;
 uint8_t gameState = STATE_INTRO_INIT;
 int16_t intro;
-uint8_t frameRate = 50;
+uint8_t frameRate = INIT_FRAME_RATE;
+uint16_t obstacleLaunchDelayMin = OBSTACLE_LAUNCH_DELAY_MIN;
+uint16_t obstacleLaunchDelayMax = OBSTACLE_LAUNCH_DELAY_MAX;
 
 
 /* -----------------------------------------------------------------------------------------------------------------------------
@@ -78,7 +86,10 @@ void setup() {
   arduboy.systemButtons();  
   arduboy.audio.begin();
   
+  obstacleLaunchDelayMin = OBSTACLE_LAUNCH_DELAY_MIN;
+  obstacleLaunchDelayMax = OBSTACLE_LAUNCH_DELAY_MAX;
   frameRate = INIT_FRAME_RATE;
+  
   arduboy.setFrameRate(frameRate);
   arduboy.initRandomSeed();
 
@@ -147,6 +158,8 @@ void intro_init() {
   sound.tones(score);
   player.initGame();
 
+  obstacleLaunchDelayMin = OBSTACLE_LAUNCH_DELAY_MIN;
+  obstacleLaunchDelayMax = OBSTACLE_LAUNCH_DELAY_MAX;
   frameRate = INIT_FRAME_RATE;
   arduboy.setFrameRate(frameRate);
 
@@ -223,6 +236,14 @@ void intro_loop() {
     Sprites::drawOverwrite(115, 50, titleLower_On, 0);
   }
 
+  if (showLevel) {
+
+    arduboy.fillRect(64, 50, 64, 14, BLACK);
+    Sprites::drawOverwrite(64, 50, level_select, 0);
+    Sprites::drawOverwrite(115, 50, levels[level], 0);
+    
+  }
+
   if (intro < 136) {
 
     arduboy.fillRect(intro - 2, 47, 200, 17, BLACK);
@@ -234,6 +255,20 @@ void intro_loop() {
   arduboy.display();
 
   if (arduboy.justPressed(UP_BUTTON)) {
+
+    if (level < 2) level++;
+    showLevel = true;
+
+  }
+
+  if (arduboy.justPressed(DOWN_BUTTON)) {
+
+    if (level > 1) level--;
+    showLevel = true;
+
+  }
+
+  if (arduboy.justPressed(LEFT_BUTTON || RIGHT_BUTTON)) {
 
     gameState = STATE_CREDITS_INIT;   
 
@@ -248,6 +283,7 @@ void intro_loop() {
   
   if (arduboy.justPressed(B_BUTTON)) {
 
+    showLevel = false;
     if (arduboy.audio.enabled()) {
   
       arduboy.audio.off(); 
@@ -289,6 +325,8 @@ void game_init() {
   intro = 80;
   gameState = STATE_GAME_LOOP;
 
+  obstacleLaunchDelayMin = OBSTACLE_LAUNCH_DELAY_MIN;
+  obstacleLaunchDelayMax = OBSTACLE_LAUNCH_DELAY_MAX;
   frameRate = INIT_FRAME_RATE;
   arduboy.setFrameRate(frameRate);
 
@@ -442,21 +480,21 @@ void game_loop() {
         player.setGrandScore(player.getGrandScore() + player.getScore());
         
         ++mission;
-        if (mission < MISSION_COUNT) {
-  
-          sound.tones(mission_success);
-          renderEndOfMission();
-          gameState = STATE_GAME_END_OF_CAMPAIGN;
-          
-        }
-        else {
+//        if (mission < MISSION_COUNT) {
+//  
+//          sound.tones(mission_success);
+//          renderEndOfMission();
+//          gameState = STATE_GAME_END_OF_CAMPAIGN;
+//          
+//        }
+//        else {
 
           intro = 40;
           sound.tones(mission_success);
           renderEndOfMission();
           gameState = STATE_GAME_END_OF_GAME;
   
-        }
+//        }
         
       }
   
@@ -473,7 +511,8 @@ void game_loop() {
   
   if (!player.getEnabled()) {
     player.setGrandScore(player.getGrandScore() + player.getScore());
-    gameState = STATE_GAME_END_OF_CAMPAIGN;
+//    gameState = STATE_GAME_END_OF_CAMPAIGN;
+    gameState = STATE_GAME_END_OF_GAME;
   }
 
 }
@@ -495,16 +534,16 @@ void end_of_mission() {
 
     arduboy.clear();
       
-    if (!player.getEnabled()) {
-     
-      arduboy.setCursor(22, 10);
-      arduboy.print(F("Mission Failed"));
-      drawHorizontalDottedLine(20, 107, 7, WHITE);
-      drawHorizontalDottedLine(20, 107, 19, WHITE);
-      gameState = STATE_INTRO_INIT;
-  
-    }
-    else {
+//    if (!player.getEnabled()) {
+//     
+//      arduboy.setCursor(22, 10);
+//      arduboy.print(F("Mission Failed"));
+//      drawHorizontalDottedLine(20, 107, 7, WHITE);
+//      drawHorizontalDottedLine(20, 107, 19, WHITE);
+//      gameState = STATE_INTRO_INIT;
+//  
+//    }
+//    else {
          
       arduboy.setCursor(11, 10);
       arduboy.print(F("Mission Successful"));
@@ -512,7 +551,7 @@ void end_of_mission() {
       drawHorizontalDottedLine(9, 118, 19, WHITE);
       gameState = STATE_GAME_INIT;
   
-    }    
+//    }    
 
     arduboy.fillRect(i - 2, 5, 255, 20, BLACK);
     Sprites::drawOverwrite(i+  48, 0, zero_E, 0);
@@ -570,9 +609,9 @@ void end_of_game() {
   
   arduboy.clear();
   arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
-  Sprites::drawOverwrite(0, 0, p38_3d, 0);
+  Sprites::drawOverwrite((playerScore > 999 ? -3 : 0), 0, p38_3d, 0);
 
-  if (!sound.playing()) sound.tones(mission_success);
+//  if (!sound.playing()) sound.tones(mission_success);
 
   if (intro < 20) {
     
@@ -593,16 +632,25 @@ void end_of_game() {
     uint16_t high = EEPROMReadInt(EEPROM_SCORE);
     if (playerScore > high) EEPROMWriteInt(EEPROM_SCORE, playerScore);
 
-    arduboy.setCursor(76, 40);
-    arduboy.print(F("Score"));
+    if (playerScore > 999 || high > 999) {
+      arduboy.setCursor(72, 40);
+      arduboy.print(F("Scor"));
+    }
+    else {
+      arduboy.setCursor(76, 40);
+      arduboy.print(F("Score"));
+    }
+        
     arduboy.setCursor(109, 40);
+    if (playerScore < 1000) arduboy.print("0");
     if (playerScore < 100) arduboy.print("0");
     if (playerScore < 10)  arduboy.print("0");
     arduboy.print(playerScore);
     
-    arduboy.setCursor(76, 52);
+    arduboy.setCursor((playerScore > 999 || high > 999 ? 72 : 76), 52);
     arduboy.print(F("High"));
     arduboy.setCursor(109, 52);
+    if (high < 1000) arduboy.print("0");
     if (high < 100) arduboy.print("0");
     if (high < 10)  arduboy.print("0");
     arduboy.print(high);
@@ -698,12 +746,12 @@ void launchObstacle() {
   obstacle.setEnabled(true);
   obstacle.setX(WIDTH);
   obstacle.setY(random(0, 54));
-  obstacle.setSpeed(randomFixedPoint<7,8>(1, 2));
+  obstacle.setSpeed(randomSFixed<7,8>(1, 2));
   obstacle.setValue(random(minValue, maxValue));
   obstacle.setBitmap(bitmap);
   obstacle.setMask(mask);
 
-  obstacleLaunchCountdown = random(OBSTACLE_LAUNCH_DELAY_MIN, OBSTACLE_LAUNCH_DELAY_MAX);
+  obstacleLaunchCountdown = random(obstacleLaunchDelayMin, obstacleLaunchDelayMax);
 
 }
 
@@ -722,7 +770,10 @@ void launchMission_FirstFormation(const uint8_t *mission) {
   launchFormation(formations[formation]);
   --mission_formations_left;
 
-  ++frameRate;
+  frameRate = frameRate + frameRateInc[level];
+  obstacleLaunchDelayMin = obstacleLaunchDelayMin + obstacleLaunchDelayInc[level];
+  obstacleLaunchDelayMax = obstacleLaunchDelayMax + obstacleLaunchDelayInc[level];
+  
   arduboy.setFrameRate(frameRate);
 
 }

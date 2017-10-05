@@ -2,8 +2,8 @@
 #include "Arduboy2.h"
 #include "Sprites.h"
 #include "Enums.h"
-#include "src/FixedPoints/FixedPoints.h"
-#include "src/FixedPoints/FixedPointsCommon.h"
+#include "FixedPoints.h"
+#include "FixedPointsCommon.h"
 
 Plane::Plane(const uint8_t * const * images) : Base(0, 0) {
   
