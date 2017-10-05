@@ -230,17 +230,17 @@ void intro_loop() {
   arduboy.clear();
 
   Sprites::drawOverwrite(2, 0, title, 0);
-  Sprites::drawOverwrite(6, 50, titleLower_Off, 0);
+  Sprites::drawOverwrite(5, 50, titleLower_Off, 0);
  
   if (arduboy.audio.enabled()) {
-    Sprites::drawOverwrite(115, 50, titleLower_On, 0);
+    Sprites::drawOverwrite(116, 50, titleLower_On, 0);
   }
 
   if (showLevel) {
 
-    arduboy.fillRect(71, 50, 64, 14, BLACK);
-    Sprites::drawOverwrite(71, 50, level_select, 0);
-    Sprites::drawOverwrite(103, 50, levels[level], 0);
+    arduboy.fillRect(72, 50, 64, 14, BLACK);
+    Sprites::drawOverwrite(72, 50, level_select, 0);
+    Sprites::drawOverwrite(105, 50, levels[level], 0);
     
   }
 
@@ -381,6 +381,8 @@ void game_loop() {
     if (arduboy.pressed(RIGHT_BUTTON) && player.getX() < WIDTH - PLAYER_WIDTH - SCOREBOARD_OUTER_RECT_WIDTH)      { player.decFuel(FUEL_DECREMENT_BOOST);
                                                                                                                     player.setX(player.getX() + PLAYER_MOVEMENT_INC_RIGHT); }
   
+    if (arduboy.justPressed(B_BUTTON))                                                                            { player.startRoll(); }
+                                                                                                                    
     if (arduboy.justPressed(A_BUTTON)) {
 
       if (player.getBullets() > 0) {
@@ -403,9 +405,6 @@ void game_loop() {
       }
   
     }
-  
-    if (arduboy.justPressed(B_BUTTON))                                                                            { player.startRoll(); }
-//    if (arduboy.pressed(B_BUTTON))                                                                                { delay(300);}
 
     if (!intro) {
 
@@ -480,21 +479,10 @@ void game_loop() {
         player.setGrandScore(player.getGrandScore() + player.getScore());
         
         ++mission;
-//        if (mission < MISSION_COUNT) {
-//  
-//          sound.tones(mission_success);
-//          renderEndOfMission();
-//          gameState = STATE_GAME_END_OF_CAMPAIGN;
-//          
-//        }
-//        else {
-
-          intro = 40;
-          sound.tones(mission_success);
-          renderEndOfMission();
-          gameState = STATE_GAME_END_OF_GAME;
-  
-//        }
+        intro = 40;
+        sound.tones(mission_success);
+        renderEndOfMission();
+        gameState = STATE_GAME_END_OF_GAME;
         
       }
   
@@ -511,7 +499,6 @@ void game_loop() {
   
   if (!player.getEnabled()) {
     player.setGrandScore(player.getGrandScore() + player.getScore());
-//    gameState = STATE_GAME_END_OF_CAMPAIGN;
     gameState = STATE_GAME_END_OF_GAME;
   }
 
@@ -533,25 +520,12 @@ void end_of_mission() {
   for (int16_t i = -60; i < 129; i+=2) {
 
     arduboy.clear();
-      
-//    if (!player.getEnabled()) {
-//     
-//      arduboy.setCursor(22, 10);
-//      arduboy.print(F("Mission Failed"));
-//      drawHorizontalDottedLine(20, 107, 7, WHITE);
-//      drawHorizontalDottedLine(20, 107, 19, WHITE);
-//      gameState = STATE_INTRO_INIT;
-//  
-//    }
-//    else {
-         
-      arduboy.setCursor(11, 10);
-      arduboy.print(F("Mission Successful"));
-      drawHorizontalDottedLine(9, 118, 7, WHITE);
-      drawHorizontalDottedLine(9, 118, 19, WHITE);
-      gameState = STATE_GAME_INIT;
-  
-//    }    
+     
+    arduboy.setCursor(11, 10);
+    arduboy.print(F("Mission Successful"));
+    drawHorizontalDottedLine(9, 118, 7, WHITE);
+    drawHorizontalDottedLine(9, 118, 19, WHITE);
+    gameState = STATE_GAME_INIT;
 
     arduboy.fillRect(i - 2, 5, 255, 20, BLACK);
     Sprites::drawOverwrite(i+  48, 0, zero_E, 0);
@@ -595,7 +569,6 @@ void end_of_mission() {
     delay(100);
   }
 
-
 }
 
 /* -----------------------------------------------------------------------------------------------------------------------------
@@ -610,8 +583,6 @@ void end_of_game() {
   arduboy.clear();
   arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
   Sprites::drawOverwrite((playerScore > 999 ? -3 : 0), 0, p38_3d, 0);
-
-//  if (!sound.playing()) sound.tones(mission_success);
 
   if (intro < 20) {
     
@@ -1408,7 +1379,9 @@ void initEEPROM() {
     EEPROM.update(EEPROM_START_C1, 52);
     EEPROM.update(EEPROM_START_C2, 51);
     EEPROMWriteInt(EEPROM_SCORE, 0);
-      
+    EEPROMWriteInt(EEPROM_SCORE + 2, 0);
+    EEPROMWriteInt(EEPROM_SCORE + 4, 0);
+    
   }
 
 }
