@@ -58,7 +58,7 @@ const uint8_t scrollIncrement = 2;
 
 uint16_t obstacleLaunchCountdown = OBSTACLE_LAUNCH_DELAY_MIN;
 uint8_t enemyShotCountdown = 5;
-uint8_t level = 0;
+uint16_t level = 0;
 bool showLevel = false;
 
 uint8_t mission = 0;                             // Mission currently being played
@@ -68,7 +68,7 @@ uint8_t mission_formations_left = 0;             // Number of formations left wi
 uint8_t formation = 0;
 uint8_t gameState = STATE_INTRO_INIT;
 int16_t intro;
-uint8_t frameRate = INIT_FRAME_RATE;
+uint16_t frameRate = INIT_FRAME_RATE;
 uint16_t obstacleLaunchDelayMin = OBSTACLE_LAUNCH_DELAY_MIN;
 uint16_t obstacleLaunchDelayMax = OBSTACLE_LAUNCH_DELAY_MAX;
 
@@ -81,13 +81,13 @@ void setup() {
 
   initEEPROM(false);
   arduboy.boot();
-  arduboy.blank();  
   arduboy.flashlight(); 
   arduboy.audio.begin();
   
   obstacleLaunchDelayMin = OBSTACLE_LAUNCH_DELAY_MIN;
   obstacleLaunchDelayMax = OBSTACLE_LAUNCH_DELAY_MAX;
   frameRate = INIT_FRAME_RATE;
+  level = (EEPROMReadInt(EEPROM_LEVEL) < 0 || EEPROMReadInt(EEPROM_LEVEL) > 2 ? 0 : EEPROMReadInt(EEPROM_LEVEL));
   
   arduboy.setFrameRate(frameRate);
   arduboy.initRandomSeed();
@@ -256,6 +256,7 @@ void intro_loop() {
   if (arduboy.justPressed(UP_BUTTON)) {
 
     if (level < 2) level++;
+    EEPROMWriteInt(EEPROM_LEVEL, level);
     showLevel = true;
 
   }
@@ -263,6 +264,7 @@ void intro_loop() {
   if (arduboy.justPressed(DOWN_BUTTON)) {
 
     if (level > 0) level--;
+    EEPROMWriteInt(EEPROM_LEVEL, level);
     showLevel = true;
 
   }
@@ -512,9 +514,9 @@ void end_of_mission() {
 
   uint16_t missionScore = player.getScore();
   uint16_t grandScore = player.getGrandScore();
-  uint16_t high = EEPROMReadInt(EEPROM_SCORE);
+  uint16_t high = EEPROMReadInt(EEPROM_SCORE + (level * 2));
   
-  if (grandScore > high) EEPROMWriteInt(EEPROM_SCORE, grandScore);
+  if (grandScore > high) EEPROMWriteInt(EEPROM_SCORE + (level * 2), grandScore);
 
 
   for (int16_t i = -60; i < 129; i+=2) {
@@ -597,10 +599,10 @@ void end_of_game() {
 
   if (intro == 0) {
 
-    uint16_t high = EEPROMReadInt(EEPROM_SCORE);
+    uint16_t high = EEPROMReadInt(EEPROM_SCORE + (level * 2));
     
     if (playerScore > high) {
-      EEPROMWriteInt(EEPROM_SCORE, playerScore);
+      EEPROMWriteInt(EEPROM_SCORE + (level * 2), playerScore);
       high = playerScore;
     }
 
@@ -674,7 +676,7 @@ void launchObstacle() {
 
 
   // For the easier levels, priotise fuel and health if the player needs it !
-  
+
   if (level < 2 && player.getFuel() <= 4) {
     type = ObstacleType::Fuel;
   }
@@ -1385,6 +1387,7 @@ void initEEPROM(bool forceOverwrite) {
     EEPROMWriteInt(EEPROM_SCORE, 0);
     EEPROMWriteInt(EEPROM_SCORE + 2, 0);
     EEPROMWriteInt(EEPROM_SCORE + 4, 0);
+    EEPROMWriteInt(EEPROM_SCORE + 6, 0);
     
   }
 
@@ -1400,8 +1403,8 @@ void EEPROMWriteInt(int address, int value) {
   uint8_t lowByte = ((value >> 0) & 0xFF);
   uint8_t highByte = ((value >> 8) & 0xFF);
   
-  EEPROM.write(address + (level * 2), lowByte);
-  EEPROM.write(address + (level * 2) + 1, highByte);
+  EEPROM.write(address, lowByte);
+  EEPROM.write(address + 1, highByte);
 
 }
 
@@ -1412,8 +1415,8 @@ void EEPROMWriteInt(int address, int value) {
  */
 uint16_t EEPROMReadInt(int address) {
   
-  uint8_t lowByte = EEPROM.read(address + (level * 2));
-  uint8_t highByte = EEPROM.read(address +  (level * 2) + 1);
+  uint8_t lowByte = EEPROM.read(address);
+  uint8_t highByte = EEPROM.read(address + 1);
   
   return ((lowByte << 0) & 0xFF) + ((highByte << 8) & 0xFF00);
 

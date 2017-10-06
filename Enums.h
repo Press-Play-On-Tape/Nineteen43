@@ -32,6 +32,7 @@
 #define EEPROM_START_C1                 200
 #define EEPROM_START_C2                 EEPROM_START_C1 + 1
 #define EEPROM_SCORE                    EEPROM_START_C1 + 2
+#define EEPROM_LEVEL                    EEPROM_START_C1 + 8
 
 #define NUMBER_OF_ENEMIES               6
 #define NUMBER_OF_MISSIONS              5

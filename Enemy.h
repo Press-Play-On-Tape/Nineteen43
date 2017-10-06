@@ -1,5 +1,5 @@
-#ifndef CAR_H
-#define CAR_H
+#ifndef ENEMY_H
+#define ENEMY_H
  
 #include "Sprites.h"
 #include "Enums.h"
