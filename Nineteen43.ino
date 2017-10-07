@@ -35,6 +35,10 @@ const uint8_t* const levels[] =          { level_00, level_01, level_02 };
 const int8_t obstacleLaunchDelayInc[] =  { OBSTACLE_LAUNCH_DELAY_INC_L0, OBSTACLE_LAUNCH_DELAY_INC_L1, OBSTACLE_LAUNCH_DELAY_INC_L2 };
 const int8_t frameRateInc[] =            { FRAME_RATE_INC_L0, FRAME_RATE_INC_L1, FRAME_RATE_INC_L2 };
 
+const SQ7x8 obstacleBulletsValueDec[] =  { BULLETS_DECREMENT_L0, BULLETS_DECREMENT_L0, BULLETS_DECREMENT_L0 };
+const SQ7x8 obstacleFuelValueDec[] =     { FUEL_DECREMENT_L0, FUEL_DECREMENT_L1, FUEL_DECREMENT_L2 };
+const SQ7x8 obstacleHealthValueDec[] =   { HEALTH_DECREMENT_L0, HEALTH_DECREMENT_L1, HEALTH_DECREMENT_L2 };
+
 Player player = { player_images };
 
 Enemy enemies[NUMBER_OF_ENEMIES] = {
@@ -69,8 +73,13 @@ uint8_t formation = 0;
 uint8_t gameState = STATE_INTRO_INIT;
 int16_t intro;
 uint16_t frameRate = INIT_FRAME_RATE;
+
 uint16_t obstacleLaunchDelayMin = OBSTACLE_LAUNCH_DELAY_MIN;
 uint16_t obstacleLaunchDelayMax = OBSTACLE_LAUNCH_DELAY_MAX;
+
+SQ7x8 obstacleBulletsValue = BULLETS_MAX;
+SQ7x8 obstacleHealthValue = HEALTH_MAX;
+SQ7x8 obstacleFuelValue = FUEL_MAX;
 
 
 /* -----------------------------------------------------------------------------------------------------------------------------
@@ -86,6 +95,10 @@ void setup() {
   
   obstacleLaunchDelayMin = OBSTACLE_LAUNCH_DELAY_MIN;
   obstacleLaunchDelayMax = OBSTACLE_LAUNCH_DELAY_MAX;
+  obstacleBulletsValue = BULLETS_MAX;
+  obstacleHealthValue = HEALTH_MAX;
+  obstacleFuelValue = FUEL_MAX;
+
   frameRate = INIT_FRAME_RATE;
   level = (EEPROMReadInt(EEPROM_LEVEL) < 0 || EEPROMReadInt(EEPROM_LEVEL) > 2 ? 0 : EEPROMReadInt(EEPROM_LEVEL));
   
@@ -102,7 +115,7 @@ void setup() {
 void loop() {
 
   if (!(arduboy.nextFrame())) return;
-
+  arduboy.clear();
   arduboy.pollButtons();
 
   switch (gameState) {
@@ -159,6 +172,10 @@ void intro_init() {
 
   obstacleLaunchDelayMin = OBSTACLE_LAUNCH_DELAY_MIN;
   obstacleLaunchDelayMax = OBSTACLE_LAUNCH_DELAY_MAX;
+  obstacleBulletsValue = BULLETS_MAX;
+  obstacleHealthValue = HEALTH_MAX;
+  obstacleFuelValue = FUEL_MAX;
+  
   frameRate = INIT_FRAME_RATE;
   arduboy.setFrameRate(frameRate);
 
@@ -172,6 +189,8 @@ void intro_init() {
 void credits_init() {
 
   intro = -32;
+  arduboy.setTextBackground(BLACK);
+  arduboy.setTextColor(WHITE);
   gameState = STATE_CREDITS_LOOP;
   
 }
@@ -226,7 +245,7 @@ void credits_loop() {
  */
 void intro_loop() {
 
-  arduboy.clear();
+  //arduboy.clear();
 
   Sprites::drawOverwrite(2, 0, title, 0);
   Sprites::drawOverwrite(5, 50, titleLower_Off, 0);
@@ -328,6 +347,10 @@ void game_init() {
 
   obstacleLaunchDelayMin = OBSTACLE_LAUNCH_DELAY_MIN;
   obstacleLaunchDelayMax = OBSTACLE_LAUNCH_DELAY_MAX;
+  obstacleBulletsValue = BULLETS_MAX;
+  obstacleHealthValue = HEALTH_MAX;
+  obstacleFuelValue = FUEL_MAX;
+  
   frameRate = INIT_FRAME_RATE;
   arduboy.setFrameRate(frameRate);
 
@@ -340,7 +363,7 @@ void game_init() {
  */
 void game_loop() {
 
-  arduboy.clear();
+  //arduboy.clear();
 
   uint8_t offsetX = (mission < 9 ? 2 : 0);
   uint8_t offsetL = (mission < 9 ? 93 : 99);
@@ -379,7 +402,7 @@ void game_loop() {
     if (arduboy.pressed(UP_BUTTON) && player.getY() > PLAYER_MOVEMENT_INC_UP)                                     { player.setY(player.getY() - PLAYER_MOVEMENT_INC_UP); }
     if (arduboy.pressed(DOWN_BUTTON) && player.getY() < HEIGHT - PLAYER_HEIGHT)                                   { player.setY(player.getY() + PLAYER_MOVEMENT_INC_DOWN); }
     if (arduboy.pressed(LEFT_BUTTON) && player.getX() > PLAYER_MOVEMENT_INC_LEFT)                                 { player.setX(player.getX() - PLAYER_MOVEMENT_INC_LEFT); }
-    if (arduboy.pressed(RIGHT_BUTTON) && player.getX() < WIDTH - PLAYER_WIDTH - SCOREBOARD_OUTER_RECT_WIDTH)      { player.decFuel(FUEL_DECREMENT_BOOST);
+    if (arduboy.pressed(RIGHT_BUTTON) && player.getX() < WIDTH - PLAYER_WIDTH - SCOREBOARD_OUTER_RECT_WIDTH)      { //player.decFuel(FUEL_DECREMENT_BOOST);
                                                                                                                     player.setX(player.getX() + PLAYER_MOVEMENT_INC_RIGHT); }
   
     if (arduboy.justPressed(B_BUTTON))                                                                            { player.startRoll(); }
@@ -462,10 +485,12 @@ void game_loop() {
       
     bool newFormation = true;
     for (uint8_t i = 0; i < NUMBER_OF_ENEMIES; ++i) {
+
       if (enemies[i].getEnabled()) {
         newFormation = false;
         break;
       }
+
     }
   
     if (newFormation) {
@@ -577,13 +602,13 @@ void end_of_mission() {
  */
 void end_of_game() {
 
-  if (intro > 0) --intro;
+  //if (intro > 0) --intro;
   uint16_t playerScore = player.getGrandScore();
   
   arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
   Sprites::drawOverwrite((playerScore > 999 ? -3 : 0), 0, p38_3d, 0);
 
-  if (intro < 20) {
+  //if (intro < 20) {
     
     arduboy.setTextBackground(WHITE);
     arduboy.setTextColor(BLACK);
@@ -595,9 +620,9 @@ void end_of_game() {
     drawHorizontalDottedLine(72, 124, 2, BLACK);
     drawHorizontalDottedLine(72, 124, 12, BLACK);
 
-  }
+  //}
 
-  if (intro == 0) {
+  //if (intro == 0) {
 
     uint16_t high = EEPROMReadInt(EEPROM_SCORE + (level * 2));
     
@@ -630,11 +655,11 @@ void end_of_game() {
     if (high < 10)  arduboy.print("0");
     arduboy.print(high);
 
-  }
+  //}
   
   arduboy.display();
 
-  delay(50);
+  //delay(50);
 
   if (arduboy.justPressed(UP_BUTTON)) { initEEPROM(true); player.setGrandScore(0); }
   if (arduboy.justPressed(A_BUTTON)) gameState = STATE_INTRO_INIT;
@@ -668,51 +693,46 @@ void launchPlayerBullet(uint8_t x, uint8_t y, Direction direction) {
  */
 void launchObstacle() {
 
-  ObstacleType type;
-  uint8_t minValue = 0;
-  uint8_t maxValue = 0;
+  ObstacleType type = (ObstacleType)random((uint8_t)ObstacleType::First, (uint8_t)ObstacleType::Count);;
+  SQ7x8 minValue = 0;
+  SQ7x8 maxValue = 0;
   const uint8_t *bitmap = nullptr;
   const uint8_t *mask = nullptr;
 
 
-  // For the easier levels, priotise fuel and health if the player needs it !
-
-  if (level < 2 && player.getFuel() <= 4) {
+  if (player.getFuel() <= 4) {
     type = ObstacleType::Fuel;
   }
-  else if (level < 2 && player.getHealth() <= 4) {
+  else if (player.getHealth() <= 4) {
     type = ObstacleType::Health;
   }
-  else {
-    type = (ObstacleType)random((uint8_t)ObstacleType::First, (uint8_t)ObstacleType::Count);
-  }
-
+  
   switch (type) {
 
     case ObstacleType::Bullets:
-      minValue = BULLETS_MAX / 2;
-      maxValue = BULLETS_MAX;
+      minValue = (obstacleBulletsValue / (SQ7x8)2);
+      maxValue = obstacleBulletsValue;
       bitmap = bullets;
       mask = bullets_mask;
       break;
 
     case ObstacleType::Fuel:
-      minValue = FUEL_MAX / 2;
-      maxValue = FUEL_MAX;
+      minValue = (obstacleFuelValue / (SQ7x8)2);
+      maxValue = obstacleFuelValue;
       bitmap = fuel;
       mask = fuel_mask;
       break;
 
     case ObstacleType::Health:
-      minValue = HEALTH_MAX / 2;
-      maxValue = HEALTH_MAX;
+      minValue = (obstacleHealthValue / (SQ7x8)2);
+      maxValue = obstacleHealthValue;
       bitmap = health;
       mask = health_mask;
       break;
 
     case ObstacleType::PowerUp:
-      minValue = BULLETS_MAX / 2;
-      maxValue = BULLETS_MAX;
+      minValue = (obstacleBulletsValue / (SQ7x8)2);
+      maxValue = obstacleBulletsValue;
       bitmap = power_up;
       mask = power_up_mask;
       break;
@@ -727,7 +747,7 @@ void launchObstacle() {
   obstacle.setX(WIDTH);
   obstacle.setY(random(0, 54));
   obstacle.setSpeed(randomSFixed<7,8>(1, 2));
-  obstacle.setValue(random(minValue, maxValue));
+  obstacle.setValue(randomSFixed<7,8>(minValue, maxValue));
   obstacle.setBitmap(bitmap);
   obstacle.setMask(mask);
 
@@ -753,7 +773,11 @@ void launchMission_FirstFormation(const uint8_t *mission) {
   frameRate = frameRate + frameRateInc[level];
   obstacleLaunchDelayMin = obstacleLaunchDelayMin + obstacleLaunchDelayInc[level];
   obstacleLaunchDelayMax = obstacleLaunchDelayMax + obstacleLaunchDelayInc[level];
-  
+
+  if (obstacleBulletsValue > BULLETS_MIN)  obstacleBulletsValue = obstacleBulletsValue - obstacleBulletsValueDec[level];
+  if (obstacleHealthValue > HEALTH_MIN)    obstacleHealthValue = obstacleHealthValue - obstacleHealthValueDec[level];
+  if (obstacleFuelValue > FUEL_MIN)        obstacleFuelValue = obstacleFuelValue - obstacleFuelValueDec[level];
+
   arduboy.setFrameRate(frameRate);
 
 }
@@ -787,7 +811,6 @@ void launchFormation(const int8_t *formation) {
   // Disable all enemies ..
 
   for (uint8_t i = 0; i < NUMBER_OF_ENEMIES; ++i) {
-  //enemies[i].setX(-32);
     enemies[i].setEnabled(false);
   }
 
@@ -1006,7 +1029,7 @@ void checkForObstacleCollision(){
           break;
 
         case ObstacleType::Bullets:
-          player.addBullets(obstacle.getValue());
+          player.addBullets(obstacle.getValue().getInteger());
           break;
 
         case ObstacleType::Health:
@@ -1015,7 +1038,7 @@ void checkForObstacleCollision(){
 
         case ObstacleType::PowerUp:
           player.setPowerUp(true);
-          player.addBullets(obstacle.getValue());
+          player.addBullets(obstacle.getValue().getInteger());
           break;
 
         case ObstacleType::Count:
@@ -1052,7 +1075,7 @@ void checkForEnemiesShot() {
           if (arduboy.collide(bulletPoint, enemies[j].getRect())) {
   
             playerBullets[i].setEnabled(false);
-            enemies[j].decHealth(1.0);
+            enemies[j].decHealth((SQ7x8)1.0);
   
             if (enemies[j].getHealth().getInteger() == 0) player.setScore(player.getScore() + 1);
             if (!sound.playing()) sound.tones(hit_by_bullets);

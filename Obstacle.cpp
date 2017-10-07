@@ -2,8 +2,10 @@
 #include "Arduboy2.h"
 #include "Sprites.h"
 #include "Enums.h"
+#include "FixedPoints.h"
+#include "FixedPointsCommon.h"
 
-Obstacle::Obstacle(const SQ15x16 x, const SQ15x16 y, const uint8_t *bitmapRef, const uint8_t *maskRef, const SQ7x8 speed, const uint8_t value) :
+Obstacle::Obstacle(const SQ15x16 x, const SQ15x16 y, const uint8_t *bitmapRef, const uint8_t *maskRef, const SQ7x8 speed, const SQ7x8 value) :
           Base(x, y) {
 
   _enabled = false;
@@ -28,13 +30,13 @@ void Obstacle::move() {
 
 }
 
-const uint8_t Obstacle::getValue() const {
+const SQ7x8 Obstacle::getValue() const {
 
   return _value;
 
 }
 
-void Obstacle::setValue(const uint8_t value) {
+void Obstacle::setValue(const SQ7x8 value) {
 
   _value = value;
 

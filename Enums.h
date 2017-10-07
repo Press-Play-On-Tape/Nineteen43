@@ -38,12 +38,26 @@
 #define NUMBER_OF_MISSIONS              5
 
 #define BULLETS_MAX                     75
+#define BULLETS_MIN                     BULLETS_MAX / 2
+#define BULLETS_DECREMENT_L0            (SQ7x8)0.000
+#define BULLETS_DECREMENT_L1            (SQ7x8)0.500
+#define BULLETS_DECREMENT_L2            (SQ7x8)1.000
+
 #define HEALTH_MAX                      14
+#define HEALTH_MIN                      HEALTH_MAX / 2
+#define HEALTH_DECREMENT_L0             (SQ7x8)0.000
+#define HEALTH_DECREMENT_L1             (SQ7x8)0.250
+#define HEALTH_DECREMENT_L2             (SQ7x8)0.500
+
 #define POWER_UP_MAX                    10
 
 #define FUEL_MAX                        14
+#define FUEL_MIN                        FUEL_MAX / 2
 #define FUEL_DECREMENT                  0.010
 #define FUEL_DECREMENT_BOOST            0.005
+#define FUEL_DECREMENT_L0               (SQ7x8)0.000
+#define FUEL_DECREMENT_L1               (SQ7x8)0.080
+#define FUEL_DECREMENT_L2               (SQ7x8)0.160
 
 #define OBSTACLE_LAUNCH_DELAY_MAX       300
 #define OBSTACLE_LAUNCH_DELAY_MIN       125

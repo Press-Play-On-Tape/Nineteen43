@@ -15,7 +15,6 @@ class Plane : public Base {
     
     const Rect getRect() const;
     const SQ7x8 getHealth() const;
-
     
     void setHealth(const SQ7x8 value);
     void addHealth(const SQ7x8 value);
