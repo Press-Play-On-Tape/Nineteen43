@@ -190,7 +190,7 @@ void credits_init() {
 
   intro = -32;
   arduboy.setTextBackground(BLACK);
-  arduboy.setTextColor(WHITE);
+  arduboy.setTextColor(WHITE);˜
   gameState = STATE_CREDITS_LOOP;
   
 }
