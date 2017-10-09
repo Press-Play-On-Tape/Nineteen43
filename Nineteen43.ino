@@ -136,7 +136,7 @@ void loop() {
       game_loop();
       break;
 
-    case STATE_GAME_END_OF_CAMPAIGN:
+    case STATE_GAME_END_OF_MISSION:
       end_of_mission();
       break;
 
@@ -508,7 +508,7 @@ void game_loop() {
         intro = 40;
         sound.tones(mission_success);
         renderEndOfMission();
-        gameState = STATE_GAME_END_OF_CAMPAIGN;
+        gameState = STATE_GAME_END_OF_MISSION;
         
       }
   
@@ -590,10 +590,14 @@ void end_of_mission() {
 
   arduboy.display();
 
-  while (!arduboy.pressed(A_BUTTON)) {
+  while (!arduboy.justPressed(A_BUTTON)) {
+    arduboy.pollButtons();
     delay(100);
   }
 
+  if (level == 0 && mission == 30) { gameState = STATE_GAME_END_OF_GAME; }
+  if (level == 1 && mission == 60) { gameState = STATE_GAME_END_OF_GAME; }
+  
 }
 
 /* -----------------------------------------------------------------------------------------------------------------------------
@@ -602,61 +606,54 @@ void end_of_mission() {
  */
 void end_of_game() {
 
-  //if (intro > 0) --intro;
   uint16_t playerScore = player.getGrandScore();
   
   arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
   Sprites::drawOverwrite((playerScore > 999 ? -3 : 0), 0, p38_3d, 0);
-
-  //if (intro < 20) {
-    
-    arduboy.setTextBackground(WHITE);
-    arduboy.setTextColor(BLACK);
-    
-    arduboy.setCursor(74, 4);
-    arduboy.print(F("Game"));
-    arduboy.setCursor(101, 4);
-    arduboy.print(F("Over"));
-    drawHorizontalDottedLine(72, 124, 2, BLACK);
-    drawHorizontalDottedLine(72, 124, 12, BLACK);
-
-  //}
-
-  //if (intro == 0) {
-
-    uint16_t high = EEPROMReadInt(EEPROM_SCORE + (level * 2));
-    
-    if (playerScore > high) {
-      EEPROMWriteInt(EEPROM_SCORE + (level * 2), playerScore);
-      high = playerScore;
-    }
-
-    if (playerScore > 999 || high > 999) {
-      arduboy.setCursor(74, 40);
-      arduboy.print(F("Scor"));
-      arduboy.setCursor(102, 40);
-      if (playerScore < 1000) arduboy.print("0");
-    }
-
-    else {
-      arduboy.setCursor(76, 40);
-      arduboy.print(F("Score"));
-      arduboy.setCursor(109, 40);
-    }
-        
-    if (playerScore < 100) arduboy.print("0");
-    if (playerScore < 10)  arduboy.print("0");
-    arduboy.print(playerScore);
-    
-    arduboy.setCursor((playerScore > 999 || high > 999 ? 72 : 76), 52);
-    arduboy.print(F("High"));
-    arduboy.setCursor((playerScore > 999 || high > 999 ? 102 : 109), 52);
-    if (high < 100) arduboy.print("0");
-    if (high < 10)  arduboy.print("0");
-    arduboy.print(high);
-
-  //}
   
+  arduboy.setTextBackground(WHITE);
+  arduboy.setTextColor(BLACK);
+  
+  arduboy.setCursor(74, 4);
+  arduboy.print(F("Game"));
+  arduboy.setCursor(101, 4);
+  arduboy.print(F("Over"));
+  drawHorizontalDottedLine(72, 124, 2, BLACK);
+  drawHorizontalDottedLine(72, 124, 12, BLACK);
+
+
+
+  uint16_t high = EEPROMReadInt(EEPROM_SCORE + (level * 2));
+  
+  if (playerScore > high) {
+    EEPROMWriteInt(EEPROM_SCORE + (level * 2), playerScore);
+    high = playerScore;
+  }
+
+  if (playerScore > 999 || high > 999) {
+    arduboy.setCursor(74, 40);
+    arduboy.print(F("Scor"));
+    arduboy.setCursor(102, 40);
+    if (playerScore < 1000) arduboy.print("0");
+  }
+
+  else {
+    arduboy.setCursor(76, 40);
+    arduboy.print(F("Score"));
+    arduboy.setCursor(109, 40);
+  }
+      
+  if (playerScore < 100) arduboy.print("0");
+  if (playerScore < 10)  arduboy.print("0");
+  arduboy.print(playerScore);
+  
+  arduboy.setCursor((playerScore > 999 || high > 999 ? 72 : 76), 52);
+  arduboy.print(F("High"));
+  arduboy.setCursor((playerScore > 999 || high > 999 ? 102 : 109), 52);
+  if (high < 100) arduboy.print("0");
+  if (high < 10)  arduboy.print("0");
+  arduboy.print(high);
+    
   arduboy.display();
 
   if (arduboy.justPressed(UP_BUTTON) && arduboy.justPressed(DOWN_BUTTON)) { initEEPROM(true); player.setGrandScore(0); }

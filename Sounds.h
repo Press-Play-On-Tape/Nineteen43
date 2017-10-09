@@ -58,21 +58,21 @@ const uint16_t collect_obstacle[] PROGMEM = {
 };
 
 const uint16_t machine_gun_player[] PROGMEM = {
-  NOTE_F2,22, NOTE_REST,3, NOTE_F2,22, NOTE_REST,3, NOTE_F2,22,
+  NOTE_F2,22, NOTE_F2,22, NOTE_F2,22,
   TONES_END
 };
 
 const uint16_t machine_gun_enemy[] PROGMEM = {
-  NOTE_F3,22, NOTE_REST,3, NOTE_F3,22, NOTE_REST,3, NOTE_F3,22,
+  NOTE_F3,22, NOTE_F3,22, NOTE_F3,22,
   TONES_END
 };
 
 const uint16_t hit_by_plane[] PROGMEM = {
-  NOTE_F3,2, NOTE_REST,3, NOTE_D4,2, NOTE_REST,3, NOTE_A4,4, NOTE_REST,2, NOTE_E3,1, 
+  NOTE_F3,3, NOTE_D4,4, NOTE_A4,4, NOTE_E3,1, 
   TONES_END
 };
 
 const uint16_t hit_by_bullets[] PROGMEM = {
-  NOTE_A3, 6, NOTE_REST,3, NOTE_D3,7, NOTE_REST,5, NOTE_C3,6, NOTE_REST,2, NOTE_F3,8, 
+  NOTE_A3,9, NOTE_D3,10, NOTE_C3,6, NOTE_F3,10, 
   TONES_END
 };

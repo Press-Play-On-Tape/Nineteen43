@@ -12,7 +12,7 @@
 #define STATE_INTRO_LOOP                 1
 #define STATE_GAME_INIT                  2
 #define STATE_GAME_LOOP                  3
-#define STATE_GAME_END_OF_CAMPAIGN       4
+#define STATE_GAME_END_OF_MISSION        4
 #define STATE_GAME_END_OF_GAME           5
 #define STATE_CREDITS_INIT               6
 #define STATE_CREDITS_LOOP               7
@@ -46,8 +46,8 @@
 #define HEALTH_MAX                      14
 #define HEALTH_MIN                      HEALTH_MAX / 2
 #define HEALTH_DECREMENT_L0             (SQ7x8)0.000
-#define HEALTH_DECREMENT_L1             (SQ7x8)0.250
-#define HEALTH_DECREMENT_L2             (SQ7x8)0.500
+#define HEALTH_DECREMENT_L1             (SQ7x8)0.300
+#define HEALTH_DECREMENT_L2             (SQ7x8)0.600
 
 #define POWER_UP_MAX                    10
 
