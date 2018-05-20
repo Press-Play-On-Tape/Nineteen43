@@ -22,7 +22,14 @@
 #include "Images/Images_Splash.h"
 #include "Images/Images_Arrays.h"
 
-Arduboy2 arduboy;
+#ifdef ORIENTATION_HORIZONTAL
+  Arduboy2 arduboy;
+#endif
+
+#ifdef ORIENTATION_VERTICAL
+  Arduboy2Base arduboy;
+#endif
+
 ArduboyTones sound(arduboy.audio.enabled);
 
 const uint8_t* const missions[] =        { mission_00, mission_01, mission_02, mission_03, mission_04 };
@@ -31,7 +38,10 @@ const int8_t* const formations[] =       { formation_00, formation_01, formation
                                            formation_13 };
 const int8_t* const sequences[] =        { seq_00, seq_01, seq_02, seq_03 };
 
+#ifdef ORIENTATION_HORIZONTAL
 const uint8_t* const levels[] =          { level_00, level_01, level_02 };
+#endif
+
 const int8_t obstacleLaunchDelayInc[] =  { OBSTACLE_LAUNCH_DELAY_INC_L0, OBSTACLE_LAUNCH_DELAY_INC_L1, OBSTACLE_LAUNCH_DELAY_INC_L2 };
 const int8_t frameRateInc[] =            { FRAME_RATE_INC_L0, FRAME_RATE_INC_L1, FRAME_RATE_INC_L2 };
 
@@ -188,11 +198,14 @@ void intro_init() {
  */
 void credits_init() {
 
-  intro = -32;
-  arduboy.setTextBackground(BLACK);
-  arduboy.setTextColor(WHITE);
-  gameState = STATE_CREDITS_LOOP;
+  #ifdef ORIENTATION_HORIZONTAL
+    intro = -32;
+    arduboy.setTextBackground(BLACK);
+    arduboy.setTextColor(WHITE);
+  #endif
   
+  gameState = STATE_CREDITS_LOOP;
+
 }
 
 
@@ -202,38 +215,71 @@ void credits_init() {
  */
 void credits_loop() {
 
-  for (int16_t i = -60; i < 129; i+=2) {
-  
-    arduboy.clear();
+  #ifdef ORIENTATION_HORIZONTAL
+
+    for (int16_t i = -60; i < 129; i+=2) {
     
-    arduboy.setCursor(44, 10);
-    arduboy.print(F("Credits"));
-    drawHorizontalDottedLine(20, 107, 7, WHITE);
-    drawHorizontalDottedLine(20, 107, 19, WHITE);
-    gameState = STATE_INTRO_INIT;
+      arduboy.clear();
+      
+      arduboy.setCursor(44, 10);
+      arduboy.print(F("Credits"));
+      drawHorizontalDottedLine(20, 107, 7, WHITE);
+      drawHorizontalDottedLine(20, 107, 19, WHITE);
+      gameState = STATE_INTRO_INIT;
+      
+      arduboy.fillRect(i - 2, 5, 255, 20, BLACK);
+      Sprites::drawOverwrite(i + 48, 0, zero_E, 0);
+      Sprites::drawOverwrite(i + 30, 18, zero_E, 0);
+      Sprites::drawOverwrite(i , 5, p38_0, 0);
+      
+      arduboy.display();
+      delay(5);
+      
+    }
     
-    arduboy.fillRect(i - 2, 5, 255, 20, BLACK);
-    Sprites::drawOverwrite(i + 48, 0, zero_E, 0);
-    Sprites::drawOverwrite(i + 30, 18, zero_E, 0);
-    Sprites::drawOverwrite(i , 5, p38_0, 0);
+    Sprites::drawOverwrite(14, 28, filmote, 0);
+    arduboy.setCursor(38, 30);
+    arduboy.print(F("Filmote (Dev)"));
+    Sprites::drawOverwrite(15, 41, pharap, 0);
+    arduboy.setCursor(38, 44);
+    arduboy.print(F("Pharap (Test)"));
+    arduboy.display();
+    
+  #endif
+
+  #ifdef ORIENTATION_VERTICAL
+
+    for (int16_t i = -20; i < 100; i++) {
+
+      while (!(arduboy.nextFrame())) {}
+
+      arduboy.clear();
+
+      Sprites::drawOverwrite(118, 12, credits_img, 0);
+      drawVerticalDottedLine(0, HEIGHT, 114, WHITE);
+      drawVerticalDottedLine(0, HEIGHT, 127, WHITE);
+
+      arduboy.fillRect(114, i - 18, 127, 200, BLACK);
+      Sprites::drawOverwrite(104, i - 18, zero_S, 0);
+      Sprites::drawOverwrite(113, i, zero_S, 0);
+    
+      arduboy.display();
+      gameState = STATE_GAME_INIT;
+
+    }  
+
+    Sprites::drawOverwrite(71, 3, filmote, 0);
+    Sprites::drawOverwrite(53, 3, pharap, 0);
+    Sprites::drawOverwrite(0, 3, aButton_continue, 0);
     
     arduboy.display();
-    delay(5);
-    
-  }
-  
-  Sprites::drawOverwrite(14, 28, filmote, 0);
-  arduboy.setCursor(38, 30);
-  arduboy.print(F("Filmote (Dev)"));
-  Sprites::drawOverwrite(15, 41, pharap, 0);
-  arduboy.setCursor(38, 44);
-  arduboy.print(F("Pharap (Test)"));
-  arduboy.display();
-  
+
+  #endif
+
   while (!arduboy.pressed(A_BUTTON)) {
     delay(100);
   }
-  
+ 
   gameState = STATE_INTRO_INIT;
   
 }
@@ -245,30 +291,67 @@ void credits_loop() {
  */
 void intro_loop() {
 
-  //arduboy.clear();
+  // horizontal
 
-  Sprites::drawOverwrite(2, 0, title, 0);
-  Sprites::drawOverwrite(5, 50, titleLower_Off, 0);
- 
-  if (arduboy.audio.enabled()) {
-    Sprites::drawOverwrite(116, 50, titleLower_On, 0);
-  }
+  #ifdef ORIENTATION_HORIZONTAL
 
-  if (showLevel) {
+    Sprites::drawOverwrite(2, 0, title, 0);
+    Sprites::drawOverwrite(5, 50, titleLower_Off, 0);
+  
+    if (arduboy.audio.enabled()) {
+      Sprites::drawOverwrite(116, 50, titleLower_On, 0);
+    }
 
-    arduboy.fillRect(72, 50, 64, 14, BLACK);
-    Sprites::drawOverwrite(72, 50, level_select, 0);
-    Sprites::drawOverwrite(105, 50, levels[level], 0);
+    if (showLevel) {
+
+      arduboy.fillRect(72, 50, 64, 14, BLACK);
+      Sprites::drawOverwrite(72, 50, level_select, 0);
+      Sprites::drawOverwrite(105, 50, levels[level], 0);
+      
+    }
+
+    if (intro < 136) {
+
+      arduboy.fillRect(intro - 2, 47, 200, 17, BLACK);
+      Sprites::drawOverwrite(intro, 47, p38_0, 0);
+      intro++;
+
+    }
+
+  #endif
+
+  #ifdef ORIENTATION_VERTICAL
+
+    Sprites::drawOverwrite(86, intro, title, 0);
+    Sprites::drawOverwrite(14, 3, aButton, 0);
     
-  }
+    Sprites::drawOverwrite(55, 70 - intro, zero_S, 0);
+    Sprites::drawOverwrite(41, 52 - intro, zero_S, 0);
+    Sprites::drawOverwrite(50, 30 - intro, zero_S, 0);
 
-  if (intro < 136) {
+    if (!showLevel) {
 
-    arduboy.fillRect(intro - 2, 47, 200, 17, BLACK);
-    Sprites::drawOverwrite(intro, 47, p38_0, 0);
-    intro++;
+      if (arduboy.audio.enabled()) {
+        Sprites::drawOverwrite(0, 3, bButton_On, 0);
+      }
+      else {
+        Sprites::drawOverwrite(0, 3, bButton_Off, 0);
+      }
 
-  }
+    }
+    else {
+
+      Sprites::drawOverwrite(0, 3, level_select, 0);
+      Sprites::drawOverwrite(2, 37, numbers_vert, (level + 1));
+
+    }
+
+    intro--;
+    if (intro < - 130) {
+      intro = 80;
+    }
+
+  #endif
 
   arduboy.display();
 
@@ -288,7 +371,7 @@ void intro_loop() {
 
   }
 
-  if (arduboy.justPressed(LEFT_BUTTON + RIGHT_BUTTON)) {
+  if (arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON)) {
 
     gameState = STATE_CREDITS_INIT;   
 
@@ -365,19 +448,43 @@ void game_loop() {
 
   //arduboy.clear();
 
-  uint8_t offsetX = (mission < 9 ? 2 : 0);
-  uint8_t offsetL = (mission < 9 ? 93 : 99);
+  #ifdef ORIENTATION_HORIZONTAL
+    uint8_t offsetX = (mission < 9 ? 2 : 0);
+    uint8_t offsetL = (mission < 9 ? 93 : 99);
+  #endif
 
+  #ifdef ORIENTATION_VERTICAL
+    uint8_t offsetY = (mission > 99 ? 0 : (mission > 9 ? 3 : 6));
+    uint8_t offsetNumber = (mission > 99 ? 46 : (mission > 9 ? 44 : 41));
+  #endif
+  
   switch (intro) {
 
     case 2 ... 80:
-      arduboy.setCursor(37 + offsetX, 29);
-      arduboy.setTextBackground(BLACK);
-      arduboy.setTextColor(WHITE);
-      arduboy.print(F("Mission "));
-      arduboy.print(mission + 1);
-      drawHorizontalDottedLine(35 + offsetX, offsetL, 26, WHITE);
-      drawHorizontalDottedLine(35 + offsetX, offsetL, 38, WHITE);
+
+      #ifdef ORIENTATION_HORIZONTAL
+
+        arduboy.setCursor(37 + offsetX, 29);
+        arduboy.setTextBackground(BLACK);
+        arduboy.setTextColor(WHITE);
+        arduboy.print(F("Mission "));
+        arduboy.print(mission + 1);
+        drawHorizontalDottedLine(35 + offsetX, offsetL, 26, WHITE);
+        drawHorizontalDottedLine(35 + offsetX, offsetL, 38, WHITE);
+
+      #endif
+
+      #ifdef ORIENTATION_VERTICAL
+
+        Sprites::drawOverwrite(60, 2 + offsetY, mission_number, 0);
+        if (mission >= 99) Sprites::drawOverwrite(60, offsetNumber, numbers_vert, (mission + 1) / 100);
+        if (mission >= 9)  Sprites::drawOverwrite(60, offsetNumber + 6, numbers_vert, ((mission + 1) / 100) % 10);
+        Sprites::drawOverwrite(60, offsetNumber + 12, numbers_vert, (mission + 1) % 10);
+        drawVerticalDottedLine(offsetY, HEIGHT - offsetY, 57, WHITE);
+        drawVerticalDottedLine(offsetY, HEIGHT - offsetY, 69, WHITE);
+
+      #endif
+
       intro--;
       break;
 
@@ -543,50 +650,112 @@ void end_of_mission() {
   
   if (grandScore > high) EEPROMWriteInt(EEPROM_SCORE + (level * 2), grandScore);
 
+  #ifdef ORIENTATION_HORIZONTAL
+    
+    for (int16_t i = -60; i < 129; i+=2) {
 
-  for (int16_t i = -60; i < 129; i+=2) {
+      arduboy.clear();
+      
+      arduboy.setCursor(11, 10);
+      arduboy.print(F("Mission Successful"));
+      drawHorizontalDottedLine(9, 118, 7, WHITE);
+      drawHorizontalDottedLine(9, 118, 19, WHITE);
+      gameState = STATE_GAME_INIT;
 
-    arduboy.clear();
-     
-    arduboy.setCursor(11, 10);
-    arduboy.print(F("Mission Successful"));
-    drawHorizontalDottedLine(9, 118, 7, WHITE);
-    drawHorizontalDottedLine(9, 118, 19, WHITE);
-    gameState = STATE_GAME_INIT;
+      arduboy.fillRect(i - 2, 5, 255, 20, BLACK);
+      Sprites::drawOverwrite(i + 48, 0, zero_E, 0);
+      Sprites::drawOverwrite(i + 30, 18, zero_E, 0);
+      Sprites::drawOverwrite(i , 5, p38_0, 0);
+    
+      arduboy.display();
+      delay(5);
 
-    arduboy.fillRect(i - 2, 5, 255, 20, BLACK);
-    Sprites::drawOverwrite(i+  48, 0, zero_E, 0);
-    Sprites::drawOverwrite(i + 30, 18, zero_E, 0);
-    Sprites::drawOverwrite(i , 5, p38_0, 0);
-  
+    }
+
+  #endif
+
+  #ifdef ORIENTATION_VERTICAL
+    
+    for (int16_t i = -20; i < 100; i++) {
+
+      while (!(arduboy.nextFrame())) {}
+
+      arduboy.clear();
+
+      Sprites::drawOverwrite(106, 2, mission_successful, 0);
+      drawVerticalDottedLine(0, HEIGHT, 102, WHITE);
+      drawVerticalDottedLine(0, HEIGHT, 127, WHITE);
+
+      arduboy.fillRect(102, i - 18, 127, 200, BLACK);
+      Sprites::drawOverwrite(102, i - 18, zero_S, 0);
+      Sprites::drawOverwrite(111, i, zero_S, 0);
+    
+      arduboy.display();
+      gameState = STATE_GAME_INIT;
+
+    }
+
+  #endif
+
+  #ifdef ORIENTATION_HORIZONTAL
+
+    arduboy.setCursor(14, 28);
+    arduboy.print(F("Mission Score "));
+    if (missionScore < 100) arduboy.print("0");
+    if (missionScore < 10)  arduboy.print("0");
+    arduboy.print(missionScore);
+
+    arduboy.setCursor(18, 40);
+    arduboy.print(F("Total Score "));
+    if (grandScore < 100) arduboy.print("0");
+    if (grandScore < 10)  arduboy.print("0");
+    arduboy.print(grandScore);
     arduboy.display();
-    delay(5);
 
-  }
+    for (uint8_t i = 0; i < 120; ++i) {
+      delay(10);
+    }
+    arduboy.setCursor(34, 55);
+    arduboy.print(F("A Continue"));
 
+    
+    drawHorizontalDottedLine(34, 38, 53, WHITE);
+    drawHorizontalDottedLine(34, 38, 63, WHITE);
 
-  arduboy.setCursor(14, 28);
-  arduboy.print(F("Mission Score "));
-  if (missionScore < 100) arduboy.print("0");
-  if (missionScore < 10)  arduboy.print("0");
-  arduboy.print(missionScore);
+  #endif
 
-  arduboy.setCursor(18, 40);
-  arduboy.print(F("Total Score "));
-  if (grandScore < 100) arduboy.print("0");
-  if (grandScore < 10)  arduboy.print("0");
-  arduboy.print(grandScore);
-  arduboy.display();
+  #ifdef ORIENTATION_VERTICAL
 
-  for (uint8_t i = 0; i < 120; ++i) {
-    delay(10);
-  }
-  arduboy.setCursor(34, 55);
-  arduboy.print(F("A Continue"));
+    // Score ..
+    {
+      Sprites::drawOverwrite(61, 4, score_img, 0);
+      uint8_t digits[4] = {};
+      extractDigits(digits, missionScore);
+      
+      for (uint8_t i = 0, y = 56; i < 4; ++i, y -= 6) {
+        Sprites::drawSelfMasked(61, y, numbers_vert, digits[i]);
+      }
+      
+    }
 
-  
-  drawHorizontalDottedLine(34, 38, 53, WHITE);
-  drawHorizontalDottedLine(34, 38, 63, WHITE);
+    // Total ..
+    {
+      Sprites::drawOverwrite(48, 4, total_img, 0);
+      uint8_t digits[4] = {};
+      extractDigits(digits, grandScore);
+      
+      for (uint8_t i = 0, y = 56; i < 4; ++i, y -= 6) {
+        Sprites::drawSelfMasked(48, y, numbers_vert, digits[i]);
+      }
+      
+    }
+
+    for (uint8_t i = 0; i < 120; ++i) {
+      delay(10);
+    }
+    Sprites::drawOverwrite(2, 3, aButton_continue, 0);
+
+  #endif
 
   arduboy.display();
 
@@ -607,53 +776,90 @@ void end_of_mission() {
 void end_of_game() {
 
   uint16_t playerScore = player.getGrandScore();
-  
-  arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
-  Sprites::drawOverwrite((playerScore > 999 ? -3 : 0), 0, p38_3d, 0);
-  
-  arduboy.setTextBackground(WHITE);
-  arduboy.setTextColor(BLACK);
-  
-  arduboy.setCursor(74, 4);
-  arduboy.print(F("Game"));
-  arduboy.setCursor(101, 4);
-  arduboy.print(F("Over"));
-  drawHorizontalDottedLine(72, 124, 2, BLACK);
-  drawHorizontalDottedLine(72, 124, 12, BLACK);
-
-
-
   uint16_t high = EEPROMReadInt(EEPROM_SCORE + (level * 2));
-  
-  if (playerScore > high) {
-    EEPROMWriteInt(EEPROM_SCORE + (level * 2), playerScore);
-    high = playerScore;
-  }
 
-  if (playerScore > 999 || high > 999) {
-    arduboy.setCursor(74, 40);
-    arduboy.print(F("Scor"));
-    arduboy.setCursor(102, 40);
-    if (playerScore < 1000) arduboy.print("0");
-  }
-
-  else {
-    arduboy.setCursor(76, 40);
-    arduboy.print(F("Score"));
-    arduboy.setCursor(109, 40);
-  }
-      
-  if (playerScore < 100) arduboy.print("0");
-  if (playerScore < 10)  arduboy.print("0");
-  arduboy.print(playerScore);
-  
-  arduboy.setCursor((playerScore > 999 || high > 999 ? 72 : 76), 52);
-  arduboy.print(F("High"));
-  arduboy.setCursor((playerScore > 999 || high > 999 ? 102 : 109), 52);
-  if (high < 100) arduboy.print("0");
-  if (high < 10)  arduboy.print("0");
-  arduboy.print(high);
+  #ifdef ORIENTATION_HORIZONTAL
     
+    arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
+    Sprites::drawOverwrite((playerScore > 999 ? -3 : 0), 0, p38_3d, 0);
+    
+    arduboy.setTextBackground(WHITE);
+    arduboy.setTextColor(BLACK);
+    
+    arduboy.setCursor(74, 4);
+    arduboy.print(F("Game"));
+    arduboy.setCursor(101, 4);
+    arduboy.print(F("Over"));
+    drawHorizontalDottedLine(72, 124, 2, BLACK);
+    drawHorizontalDottedLine(72, 124, 12, BLACK);
+    
+    if (playerScore > high) {
+      EEPROMWriteInt(EEPROM_SCORE + (level * 2), playerScore);
+      high = playerScore;
+    }
+
+    if (playerScore > 999 || high > 999) {
+      arduboy.setCursor(74, 40);
+      arduboy.print(F("Scor"));
+      arduboy.setCursor(102, 40);
+      if (playerScore < 1000) arduboy.print("0");
+    }
+
+    else {
+      arduboy.setCursor(76, 40);
+      arduboy.print(F("Score"));
+      arduboy.setCursor(109, 40);
+    }
+        
+    if (playerScore < 100) arduboy.print("0");
+    if (playerScore < 10)  arduboy.print("0");
+    arduboy.print(playerScore);
+    
+    arduboy.setCursor((playerScore > 999 || high > 999 ? 72 : 76), 52);
+    arduboy.print(F("High"));
+    arduboy.setCursor((playerScore > 999 || high > 999 ? 102 : 109), 52);
+    if (high < 100) arduboy.print("0");
+    if (high < 10)  arduboy.print("0");
+    arduboy.print(high);
+
+  #endif
+
+
+  #ifdef ORIENTATION_VERTICAL
+
+    arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
+    Sprites::drawOverwrite(0, 0, p38_3d, 0);
+
+    Sprites::drawOverwrite(118, 8, game_over, 0);
+    drawVerticalDottedLine(0, HEIGHT, 114, BLACK);
+    drawVerticalDottedLine(0, HEIGHT, 127, BLACK);
+
+    // Score ..
+    {
+      Sprites::drawOverwrite(87, 4, score_White, 0);
+      uint8_t digits[4] = {};
+      extractDigits(digits, playerScore);
+      
+      for (uint8_t i = 0, y = 56; i < 4; ++i, y -= 6) {
+        Sprites::drawErase(87, y, numbers_vert, digits[i]);
+      }
+      
+    }
+
+    // Total ..
+    {
+      Sprites::drawOverwrite(74, 4, high_img, 0);
+      uint8_t digits[4] = {};
+      extractDigits(digits, high);
+      
+      for (uint8_t i = 0, y = 56; i < 4; ++i, y -= 6) {
+        Sprites::drawErase(74, y, numbers_vert, digits[i]);
+      }
+      
+    }
+
+  #endif
+
   arduboy.display();
 
   if (arduboy.justPressed(UP_BUTTON) && arduboy.justPressed(DOWN_BUTTON)) { initEEPROM(true); player.setGrandScore(0); }
@@ -1376,10 +1582,22 @@ void renderScoreboadGauge(const uint8_t imageX, const uint8_t imageY, const uint
  *  So much nicer than a solid line!
  * ----------------------------------------------------------------------------
  */
-void drawHorizontalDottedLine(uint8_t x1, uint8_t x2, uint8_t y, uint8_t color) {
+void drawHorizontalDottedLine(uint8_t x1, uint8_t x2, uint8_t y, uint8_t colour) {
 
   for (int x3 = x1; x3 <= x2; x3+=2) {
-    arduboy.drawPixel(x3, y, color);
+    arduboy.drawPixel(x3, y, colour);
+  }
+  
+}
+
+
+/* ----------------------------------------------------------------------------
+ *  Draw a vertical dotted line. 
+ */
+void drawVerticalDottedLine(uint8_t y1, uint8_t y2, uint8_t x, uint8_t colour) {
+
+  for (uint8_t y3 = y1; y3 <= y2; y3+=2) {
+    arduboy.drawPixel(x, y3, colour);
   }
   
 }

@@ -1,5 +1,4 @@
-#ifndef ENEMY_BULLET_H
-#define ENEMY_BULLET_H
+#pragma once
  
 #include "EnemyBullet.h"
 #include "Bullet.h"
@@ -15,5 +14,3 @@ class EnemyBullet : public Bullet {
     void move();
 
 };
-
-#endif

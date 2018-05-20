@@ -1,5 +1,4 @@
-#ifndef SEQUENCES_H
-#define SEQUENCES_H
+#pragma once
 
 #define END_SEQUENCE      -127
 #define END_SEQUENCE_UINT 129
@@ -10,19 +9,6 @@
  *  Format:  [Number of formations], [Formation Index 1], [Formation Index 2], .. 
  * -----------------------------------------------------------------------------------------------------------------------------
  */
-
-//const uint8_t PROGMEM mission_00[] = {
-//  9,
-//  0, 
-//  0, 
-//  0, 
-//  0, 
-//  0, 
-//  0, 
-//  0, 
-//  0, 
-//  0, 
-//};
 
 const uint8_t PROGMEM mission_00[] = { 14, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
 const uint8_t PROGMEM mission_01[] = { 14, 7, 8, 9, 13, 0, 1, 2, 3, 10, 11, 12, 4, 5, 6 };
@@ -219,6 +205,4 @@ const int8_t PROGMEM seq_03[] = {         /* Straight Down */
   0, 1, 80,
   0, 0, END_SEQUENCE,
 };
-
-#endif
 

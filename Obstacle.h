@@ -1,5 +1,4 @@
-#ifndef OBSTACLE_H
-#define OBSTACLE_H
+#pragma once
  
 #include "Arduboy2.h"
 #include "Sprites.h"
@@ -38,5 +37,5 @@ class Obstacle : public Base {
     const uint8_t *_bitmap;
     const uint8_t *_mask;
 };
-#endif
+
 

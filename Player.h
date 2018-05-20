@@ -1,5 +1,4 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#pragma once
  
 #include "Arduboy2.h"
 #include "Sprites.h"
@@ -44,4 +43,4 @@ class Player : public Plane {
     uint8_t _powerUp;
     
 };
-#endif
+

@@ -1,6 +1,5 @@
-#ifndef PLANE_H
-#define PLANE_H
- 
+#pragma once
+
 #include "Sprites.h"
 #include "Base.h"
 #include "Enums.h"
@@ -26,4 +25,3 @@ class Plane : public Base {
     const uint8_t * const * _bitmaps;
 
 };
-#endif

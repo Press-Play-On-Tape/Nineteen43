@@ -1,5 +1,4 @@
-#ifndef ENEMY_H
-#define ENEMY_H
+#pragma once
  
 #include "Sprites.h"
 #include "Enums.h"
@@ -71,4 +70,3 @@ class Enemy : public Plane {
     int8_t _repeatSeqYInc;
 
 };
-#endif
