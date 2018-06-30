@@ -1,5 +1,4 @@
-#ifndef BASE_H
-#define BASE_H
+#pragma once
 
 #include "FixedPoints.h"
 #include "FixedPointsCommon.h"
@@ -26,4 +25,3 @@ class Base {
 
 };
 
-#endif
