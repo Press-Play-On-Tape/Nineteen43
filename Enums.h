@@ -5,8 +5,8 @@
 #include <Arduboy2.h>
 
 
-#define ORIENTATION_HORIZONTAL
-//#define ORIENTATION_VERTICAL
+//#define ORIENTATION_HORIZONTAL
+#define ORIENTATION_VERTICAL
 
 
 // Game States ..

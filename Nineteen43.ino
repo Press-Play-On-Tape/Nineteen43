@@ -830,9 +830,9 @@ void end_of_game() {
     arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
     Sprites::drawOverwrite(0, 0, p38_3d, 0);
 
-    Sprites::drawOverwrite(118, 8, game_over, 0);
-    drawVerticalDottedLine(0, HEIGHT, 114, BLACK);
-    drawVerticalDottedLine(0, HEIGHT, 127, BLACK);
+    Sprites::drawOverwrite(117, 8, game_over, 0);
+    drawVerticalDottedLine(0, HEIGHT, 113, BLACK);
+    drawVerticalDottedLine(0, HEIGHT, 126, BLACK);
 
     // Score ..
     {
