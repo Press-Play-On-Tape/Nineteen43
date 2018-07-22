@@ -355,27 +355,57 @@ void intro_loop() {
 
   arduboy.display();
 
-  if (arduboy.justPressed(UP_BUTTON)) {
+  #ifdef ORIENTATION_HORIZONTAL
 
-    if (level < 2) level++;
-    EEPROMWriteInt(EEPROM_LEVEL, level);
-    showLevel = true;
+    if (arduboy.justPressed(UP_BUTTON)) {
 
-  }
+      if (level < 2) level++;
+      EEPROMWriteInt(EEPROM_LEVEL, level);
+      showLevel = true;
 
-  if (arduboy.justPressed(DOWN_BUTTON)) {
+    }
 
-    if (level > 0) level--;
-    EEPROMWriteInt(EEPROM_LEVEL, level);
-    showLevel = true;
+    if (arduboy.justPressed(DOWN_BUTTON)) {
 
-  }
+      if (level > 0) level--;
+      EEPROMWriteInt(EEPROM_LEVEL, level);
+      showLevel = true;
 
-  if (arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON)) {
+    }
 
-    gameState = STATE_CREDITS_INIT;   
+    if (arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON)) {
 
-  }
+      gameState = STATE_CREDITS_INIT;   
+
+    }
+    
+  #endif
+
+  #ifdef ORIENTATION_VERTICAL
+
+    if (arduboy.justPressed(RIGHT_BUTTON)) {
+
+      if (level < 2) level++;
+      EEPROMWriteInt(EEPROM_LEVEL, level);
+      showLevel = true;
+
+    }
+
+    if (arduboy.justPressed(LEFT_BUTTON)) {
+
+      if (level > 0) level--;
+      EEPROMWriteInt(EEPROM_LEVEL, level);
+      showLevel = true;
+
+    }
+
+    if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON)) {
+
+      gameState = STATE_CREDITS_INIT;   
+
+    }
+
+  #endif
 
   if (arduboy.justPressed(A_BUTTON)) { 
     
@@ -478,7 +508,7 @@ void game_loop() {
 
         Sprites::drawOverwrite(60, 2 + offsetY, mission_number, 0);
         if (mission >= 99) Sprites::drawOverwrite(60, offsetNumber, numbers_vert, (mission + 1) / 100);
-        if (mission >= 9)  Sprites::drawOverwrite(60, offsetNumber + 6, numbers_vert, ((mission + 1) / 100) % 10);
+        if (mission >= 9)  Sprites::drawOverwrite(60, offsetNumber + 6, numbers_vert, ((mission + 1) / 10) % 10);
         Sprites::drawOverwrite(60, offsetNumber + 12, numbers_vert, (mission + 1) % 10);
         drawVerticalDottedLine(offsetY, HEIGHT - offsetY, 57, WHITE);
         drawVerticalDottedLine(offsetY, HEIGHT - offsetY, 69, WHITE);
@@ -610,7 +640,6 @@ void game_loop() {
       else {
 
         player.setGrandScore(player.getGrandScore() + player.getScore());
-        
         ++mission;
         intro = 40;
         sound.tones(mission_success);
