@@ -1543,10 +1543,14 @@ void renderEndOfMission() {
     renderScenery();
     #endif
 
+#ifndef PLANES_HAVE_BORDERS
     Sprites::drawOverwrite(player.getX().getInteger() + i, player.getY().getInteger(), p38_0, 0);
+#else
+    Sprites::drawExternalMask(player.getX().getInteger() + i, player.getY().getInteger(), p38_0, p38_mask_0, 0, 0);
+#endif
     renderScoreboard();
     arduboy.display();
-    delay(10);
+    delay(20);
 
   }
 

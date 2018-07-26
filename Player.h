@@ -16,21 +16,21 @@ class Player : public Plane {
     void initGame();
     void initMission();
 
-    const SQ7x8 getFuel() const;
-    const uint8_t getBullets() const;
-    const uint16_t getScore() const;
-    const uint16_t getGrandScore() const;
-    const bool inRoll() const;
-    const bool getPowerUp() const;
+    SQ7x8 getFuel();
+    uint8_t getBullets();
+    uint16_t getScore();
+    uint16_t getGrandScore();
+    bool inRoll();
+    bool getPowerUp();
 
-    void setFuel(const SQ7x8 value);
-    void decFuel(const SQ7x8 value);
-    void setBullets(const uint8_t value);
-    void addBullets(const uint8_t value);
+    void setFuel(SQ7x8 value);
+    void decFuel(SQ7x8 value);
+    void setBullets(uint8_t value);
+    void addBullets(uint8_t value);
     void decBullets();
-    void setScore(const uint16_t value);
-    void setGrandScore(const uint16_t value);
-    void setPowerUp(const boolean value);
+    void setScore(uint16_t value);
+    void setGrandScore(uint16_t value);
+    void setPowerUp(boolean value);
     void decPowerUp();
     void startRoll();
   

@@ -14,16 +14,16 @@ class Obstacle : public Base {
    
     Obstacle(const SQ15x16 x, const SQ15x16 y, const uint8_t *bitmapRef, const uint8_t *maskRef, const SQ7x8 speed, const SQ7x8 value);
 
-    const SQ7x8 getValue() const;
-    const SQ7x8 getSpeed() const;
-    const ObstacleType getObstacleType() const;
-    const Rect getRect() const;
+    SQ7x8 getValue();
+    SQ7x8 getSpeed();
+    ObstacleType getObstacleType();
+    Rect getRect();
            
-    void setValue(const SQ7x8 value);
-    void setSpeed(const SQ7x8 value);
-    void setObstacleType(const ObstacleType value);
-    void setBitmap(const uint8_t *value);
-    void setMask(const uint8_t *value);
+    void setValue(SQ7x8 value);
+    void setSpeed(SQ7x8 value);
+    void setObstacleType(ObstacleType value);
+    void setBitmap(uint8_t *value);
+    void setMask(uint8_t *value);
          
     void move();
     void renderImage();  

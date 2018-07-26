@@ -16,7 +16,7 @@ Obstacle::Obstacle(const SQ15x16 x, const SQ15x16 y, const uint8_t *bitmapRef, c
     
 }
 
-const Rect Obstacle::getRect() const {
+Rect Obstacle::getRect() {
 
   return (Rect){ _x.getInteger(), _y.getInteger(), pgm_read_byte(&_bitmap[0]), pgm_read_byte(&_bitmap[1]) };
 
@@ -30,49 +30,49 @@ void Obstacle::move() {
 
 }
 
-const SQ7x8 Obstacle::getValue() const {
+SQ7x8 Obstacle::getValue() {
 
   return _value;
 
 }
 
-void Obstacle::setValue(const SQ7x8 value) {
+void Obstacle::setValue(SQ7x8 value) {
 
   _value = value;
 
 }
 
-const SQ7x8 Obstacle::getSpeed() const {
+SQ7x8 Obstacle::getSpeed() {
 
   return _value;
 
 }
 
-void Obstacle::setSpeed(const SQ7x8 value) {
+void Obstacle::setSpeed(SQ7x8 value) {
 
   _speed = value;
 
 }
 
-const ObstacleType Obstacle::getObstacleType() const {
+ObstacleType Obstacle::getObstacleType() {
 
   return _obstacleType;
 
 }
 
-void Obstacle::setObstacleType(const ObstacleType value) {
+void Obstacle::setObstacleType(ObstacleType value) {
 
   _obstacleType = value;
   
 }
 
-void Obstacle::setBitmap(const uint8_t *value) {
+void Obstacle::setBitmap(uint8_t *value) {
 
   _bitmap = value;
   
 }
 
-void Obstacle::setMask(const uint8_t *value) {
+void Obstacle::setMask(uint8_t *value) {
 
   _mask = value;
   

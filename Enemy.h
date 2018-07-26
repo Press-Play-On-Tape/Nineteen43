@@ -11,36 +11,36 @@ class Enemy : public Plane {
     Enemy(const EnemyType type, 
           const uint8_t * const * images);
         
-    const Rect getRect() const;
+    const Rect getRect();
     void renderImage();
     void move();
     
-    const EnemyType getEnemyType() const;
-    const Direction getDirection() const;
-    const Direction getTurretDirection() const;
-    const int8_t *getStartingPos() const;
-    const int8_t getOffsetX() const;
-    const int8_t getOffsetY() const;
-    const uint8_t getDelayStart() const;
-    const bool getInvertX() const;
-    const bool getInvertY() const;
-    const uint8_t getNumberOfBulletsFired() const;
-    const uint8_t getWidth() const;
-    const uint8_t getHeight() const;
+    EnemyType getEnemyType();
+    Direction getDirection();
+    Direction getTurretDirection();
+//    int8_t *getStartingPos();
+    int8_t getOffsetX();
+    int8_t getOffsetY();
+    uint8_t getDelayStart();
+    bool getInvertX();
+    bool getInvertY();
+    uint8_t getNumberOfBulletsFired();
+    uint8_t getWidth();
+    uint8_t getHeight();
     
     void setHealth(const SQ7x8 value);
     void decHealth(const SQ7x8 value);    
         
-    void setEnemyType(const EnemyType value);
-    void setDirection(const Direction value);
-    void setTurretDirection(const Direction value);
-    void setStartingPos(const int8_t *startingPos);
-    void setOffsetX(const int8_t value);
-    void setOffsetY(const int8_t value);
-    void setDelayStart(const uint8_t value);
-    void setInvertX(const bool value);
-    void setInvertY(const bool value);
-    void setNumberOfBulletsFired(const uint8_t value);
+    void setEnemyType(EnemyType value);
+    void setDirection(Direction value);
+    void setTurretDirection(Direction value);
+    void setStartingPos(int8_t *startingPos);
+    void setOffsetX(int8_t value);
+    void setOffsetY(int8_t value);
+    void setDelayStart(uint8_t value);
+    void setInvertX(bool value);
+    void setInvertY(bool value);
+    void setNumberOfBulletsFired(uint8_t value);
     void decNumberOfBulletsFired();
        
   private:
@@ -60,7 +60,7 @@ class Enemy : public Plane {
     bool _invertY;
     uint8_t _delayStart;
     int16_t _currentPos;
-    const int8_t *_startingPos;
+    int8_t *_startingPos;
 
     
     // Store the details of a 'repeat' step in a sequence ..

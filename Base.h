@@ -9,13 +9,13 @@ class Base {
 
     Base(SQ15x16 x, SQ15x16 y);
 
-    const SQ15x16 getX() const;
-    const SQ15x16 getY() const;
-    const bool getEnabled() const;
+    SQ15x16 getX();
+    SQ15x16 getY();
+    bool getEnabled();
 
-    void setX(const SQ15x16 value);
-    void setY(const SQ15x16 value);
-    void setEnabled(const bool value);
+    void setX(SQ15x16 value);
+    void setY(SQ15x16 value);
+    void setEnabled(bool value);
 
   protected:
 

@@ -4,7 +4,7 @@
 
 Bullet::Bullet() { }
 
-const uint8_t Bullet::getX() const {
+uint8_t Bullet::getX() {
 
   return _x;
 
@@ -16,7 +16,7 @@ void Bullet::setX(const uint8_t value) {
 
 }
 
-const uint8_t Bullet::getY() const {
+uint8_t Bullet::getY() {
 
   return _y;
 
@@ -28,7 +28,7 @@ void Bullet::setY(const uint8_t value) {
 
 }
 
-const Direction Bullet::getDirection() const {
+Direction Bullet::getDirection() {
 
   return _direction;
 
@@ -40,7 +40,7 @@ void Bullet::setDirection(const Direction value) {
   
 }
 
-const bool Bullet::getEnabled() const {
+bool Bullet::getEnabled() {
 
   return _enabled;
 

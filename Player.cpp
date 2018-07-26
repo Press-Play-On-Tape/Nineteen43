@@ -32,19 +32,19 @@ void Player::initMission() {
   
 }
 
-const SQ7x8 Player::getFuel() const {
+SQ7x8 Player::getFuel() {
 
   return _fuel;
 
 }
 
-void Player::setFuel(const SQ7x8 value) {
+void Player::setFuel(SQ7x8 value) {
 
   _fuel = value;
 
 }
 
-void Player::decFuel(const SQ7x8 value) {
+void Player::decFuel(SQ7x8 value) {
 
   if (_fuel > 0) {
     _fuel = _fuel - value;
@@ -53,7 +53,7 @@ void Player::decFuel(const SQ7x8 value) {
 
 }
 
-const uint8_t Player::getBullets() const {
+uint8_t Player::getBullets() {
 
   return _bullets;
 
@@ -78,25 +78,25 @@ void Player::decBullets() {
 
 }
 
-const uint16_t Player::getScore() const {
+uint16_t Player::getScore() {
 
   return _score;
 
 }
 
-void Player::setScore(const uint16_t value) {
+void Player::setScore(uint16_t value) {
 
   _score = value;
 
 }
 
-const uint16_t Player::getGrandScore() const {
+uint16_t Player::getGrandScore() {
 
   return _grandScore;
 
 }
 
-void Player::setGrandScore(const uint16_t value) {
+void Player::setGrandScore(uint16_t value) {
 
   _grandScore = value;
 
@@ -108,13 +108,13 @@ void Player::startRoll() {
 
 }
 
-const bool Player::inRoll() const {
+bool Player::inRoll() {
 
   return (_rollState != 0);
 
 }
 
-void Player::setPowerUp(const bool value) {
+void Player::setPowerUp(bool value) {
 
   _powerUp = (value ? POWER_UP_MAX : 0);
 
@@ -126,7 +126,7 @@ void Player::decPowerUp() {
 
 }
 
-const bool Player::getPowerUp() const {
+bool Player::getPowerUp() {
 
   return (_powerUp != 0);
 
@@ -134,12 +134,15 @@ const bool Player::getPowerUp() const {
 
 void Player::renderImage() {
 
-  if (_x.getInteger() + PLAYER_WIDTH >= 0 && _x.getInteger() < WIDTH) {
+  int16_t x = _x.getInteger();
+  int16_t y = _y.getInteger();
+
+  if (x + PLAYER_WIDTH >= 0 && x < WIDTH) {
 
     if (_fuel > 0 && _health >= -5) {
 
       auto roll = _rollState / ROLL_DELAY;
-      auto rollX = _x.getInteger();
+      auto rollX = x;
 
       switch (roll) {
  
@@ -182,7 +185,7 @@ void Player::renderImage() {
         _rollState = 0;
       }
 
-      Sprites::drawExternalMask(rollX, _y.getInteger(), pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(roll) ]), pgm_read_word_near(&_bitmaps[IMAGES_MASK_OFFSET + (static_cast<uint8_t>(roll) )]), 0, 0);
+      Sprites::drawExternalMask(rollX, y, pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(roll) ]), pgm_read_word_near(&_bitmaps[IMAGES_MASK_OFFSET + (static_cast<uint8_t>(roll) )]), 0, 0);
 
     }
  
@@ -194,15 +197,15 @@ void Player::renderImage() {
       switch (_health.getInteger()) {
   
         case -2 ... -1:
-          Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + static_cast<uint8_t>(bitmap)]), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_MASK_OFFSET + static_cast<uint8_t>(bitmap)]), 0, 0);
+          Sprites::drawExternalMask(x, y, pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + static_cast<uint8_t>(bitmap)]), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_MASK_OFFSET + static_cast<uint8_t>(bitmap)]), 0, 0);
           break;
           
         case -4 ... -3:
-          Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + static_cast<uint8_t>(bitmap)]), 0);
+          Sprites::drawOverwrite(x, y, pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + static_cast<uint8_t>(bitmap)]), 0);
           break;
 
         case -6 ... -5:
-          Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + 3]), 0);
+          Sprites::drawOverwrite(x, y, pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + 3]), 0);
           break;
           
         case -10:
@@ -217,7 +220,7 @@ void Player::renderImage() {
 
       _fuel = _fuel - (SQ7x8)0.05;
 
-      uint8_t fuelX = _x.getInteger();
+      uint8_t fuelX = x;
       uint8_t absFuel = abs(_fuel.getInteger());
       uint8_t bitmap = 0;
       uint8_t mask = 0;
@@ -267,7 +270,7 @@ void Player::renderImage() {
       }    
 
       if (bitmap != 0) {
-        Sprites::drawExternalMask(fuelX, _y.getInteger(), pgm_read_word_near(&_bitmaps[bitmap]), pgm_read_word_near(&_bitmaps[mask]), 0, 0);
+        Sprites::drawExternalMask(fuelX, y, pgm_read_word_near(&_bitmaps[bitmap]), pgm_read_word_near(&_bitmaps[mask]), 0, 0);
       }
       
     }

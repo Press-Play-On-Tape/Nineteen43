@@ -9,37 +9,37 @@ Base::Base(SQ15x16 x, SQ15x16 y) {
 
 }
 
-const SQ15x16 Base::getX() const {
+SQ15x16 Base::getX() {
 
   return _x;
 
 }
 
-void Base::setX(const SQ15x16 value) {
+void Base::setX(SQ15x16 value) {
 
   _x = value;
 
 }
 
-const SQ15x16 Base::getY() const {
+SQ15x16 Base::getY() {
 
   return _y;
 
 }
 
-void Base::setY(const SQ15x16 value) {
+void Base::setY(SQ15x16 value) {
 
   _y = value;
 
 }
 
-const bool Base::getEnabled() const {
+bool Base::getEnabled() {
 
   return _enabled;
 
 }
 
-void Base::setEnabled(const bool value) {
+void Base::setEnabled(bool value) {
 
   _enabled = value;
 

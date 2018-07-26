@@ -23,7 +23,7 @@ Enemy::Enemy(const EnemyType type,
 
 }
 
-const Rect Enemy::getRect() const {
+const Rect Enemy::getRect() {
 
   #ifndef PLANES_HAVE_BORDERS
   return (Rect){ _x.getInteger(), _y.getInteger(), pgm_read_byte(pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(Direction::West)])), pgm_read_byte(pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(Direction::West) + 1])) };
@@ -33,142 +33,142 @@ const Rect Enemy::getRect() const {
 
 }
 
-const uint8_t Enemy::getWidth() const {
+uint8_t Enemy::getWidth() {
 
   return pgm_read_byte(pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(Direction::West)])); // The boat uses only image 7.  Images 1-6 and 8 are used to store the turret.
 
 }
 
-const uint8_t Enemy::getHeight() const {
+uint8_t Enemy::getHeight() {
 
   return pgm_read_byte(pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(Direction::West) + 1]));
 
 }
 
-const EnemyType Enemy::getEnemyType() const {
+EnemyType Enemy::getEnemyType() {
 
   return _type;
 
 }
 
-void Enemy::setEnemyType(const EnemyType value) {
+void Enemy::setEnemyType(EnemyType value) {
 
   _type = value;
 
 }
 
-const Direction Enemy::getDirection() const {
+Direction Enemy::getDirection() {
 
   return _direction;
 
 }
 
-void Enemy::setDirection(const Direction value) {
+void Enemy::setDirection(Direction value) {
 
   _direction = value;
 
 }
 
-const Direction Enemy::getTurretDirection() const {
+Direction Enemy::getTurretDirection() {
 
   return _turretDirection;
 
 }
 
-void Enemy::setTurretDirection(const Direction value) {
+void Enemy::setTurretDirection(Direction value) {
 
   _turretDirection = value;
 
 }
 
-const int8_t *Enemy::getStartingPos() const {
+// int8_t *Enemy::getStartingPos() {
 
-  return _startingPos;
+//   return _startingPos;
 
-}
+// }
 
-void Enemy::setStartingPos(const int8_t *value) {
+void Enemy::setStartingPos(int8_t *value) {
 
   _startingPos = value;
   _currentPos = 0;
   
 }
 
-const int8_t Enemy::getOffsetX() const {
+int8_t Enemy::getOffsetX() {
 
   return _offsetX;
 
 }
 
-void Enemy::setOffsetX(const int8_t value) {
+void Enemy::setOffsetX(int8_t value) {
 
   _offsetX = value;
 
 }
 
-const int8_t Enemy::getOffsetY() const {
+int8_t Enemy::getOffsetY() {
 
   return _offsetY;
 
 }
 
-void Enemy::setOffsetY(const int8_t value) {
+void Enemy::setOffsetY(int8_t value) {
 
   _offsetY = value;
 
 }
 
-const uint8_t Enemy::getDelayStart() const {
+uint8_t Enemy::getDelayStart() {
 
   return _delayStart;
 
 }
 
-void Enemy::setDelayStart(const uint8_t value) {
+void Enemy::setDelayStart(uint8_t value) {
 
   _delayStart = value;
 
 }
 
-const bool Enemy::getInvertX() const {
+bool Enemy::getInvertX() {
 
   return _invertX;
 
 }
 
-void Enemy::setInvertX(const bool value) {
+void Enemy::setInvertX(bool value) {
 
   _invertX = value;
 
 }
 
-const bool Enemy::getInvertY() const {
+bool Enemy::getInvertY() {
 
   return _invertY;
 
 }
 
-void Enemy::setInvertY(const bool value) {
+void Enemy::setInvertY(bool value) {
 
   _invertY = value;
 
 }
 
-void Enemy::setHealth(const SQ7x8 value) {
+void Enemy::setHealth(SQ7x8 value) {
 
   Plane::setHealth(value);
   _explosionImage = 0;
 
 }
 
-void Enemy::decHealth(const SQ7x8 value) {
+void Enemy::decHealth(SQ7x8 value) {
 
   Plane::decHealth(value);
   _explosionImage = 3;
 
 }
 
-const uint8_t Enemy::getNumberOfBulletsFired() const {
+uint8_t Enemy::getNumberOfBulletsFired() {
 
   return _bulletsFired;
 
@@ -188,13 +188,16 @@ void Enemy::decNumberOfBulletsFired() {
 
 void Enemy::renderImage() {
 
-  if (_enabled && _delayStart == 0 && _x.getInteger() + this->getWidth() >= 0 && _x.getInteger() < WIDTH) {
+  int16_t x = _x.getInteger();
+  int16_t y = _y.getInteger();
+  
+  if (_enabled && _delayStart == 0 && x + this->getWidth() >= 0 && x < WIDTH) {
 
-    Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(_direction)]), pgm_read_word_near(&_bitmaps[IMAGES_MASK_OFFSET + static_cast<uint8_t>(_direction)]), 0, 0);
+    Sprites::drawExternalMask(x, y, pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(_direction)]), pgm_read_word_near(&_bitmaps[IMAGES_MASK_OFFSET + static_cast<uint8_t>(_direction)]), 0, 0);
     
     if (_type == EnemyType::Boat && _turretDirection != Direction::West) {
 
-      Sprites::drawExternalMask(_x.getInteger() + ENEMY_BOAT_TURRENT_X, _y.getInteger() + ENEMY_BOAT_TURRENT_Y, pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(_turretDirection)]), pgm_read_word_near(&_bitmaps[IMAGES_MASK_OFFSET + static_cast<uint8_t>(_turretDirection)]), 0, 0);
+      Sprites::drawExternalMask(x + ENEMY_BOAT_TURRENT_X, y + ENEMY_BOAT_TURRENT_Y, pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(_turretDirection)]), pgm_read_word_near(&_bitmaps[IMAGES_MASK_OFFSET + static_cast<uint8_t>(_turretDirection)]), 0, 0);
       
     }
 
@@ -208,15 +211,23 @@ void Enemy::renderImage() {
       switch (healthInt) {
   
         case -1 ... 0:
-          Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + static_cast<uint8_t>(absHealthInt)]), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_MASK_OFFSET + static_cast<uint8_t>(absHealthInt)]), 0, 0);
+          Sprites::drawExternalMask(x, y, pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + static_cast<uint8_t>(absHealthInt)]), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_MASK_OFFSET + static_cast<uint8_t>(absHealthInt)]), 0, 0);
           break;
           
         case -3 ... -2:
-          Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + static_cast<uint8_t>(absHealthInt)]), 0);
+#ifndef PLANES_HAVE_BORDERS       
+          Sprites::drawOverwrite(x, y, pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + static_cast<uint8_t>(absHealthInt)]), 0);
+#else
+          Sprites::drawExternalMask(x, y, pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + static_cast<uint8_t>(absHealthInt)]), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_MASK_OFFSET + static_cast<uint8_t>(absHealthInt)]), 0, 0);
+#endif
           break;
 
         case -4:
-          Sprites::drawOverwrite(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + 3]), 0);
+#ifndef PLANES_HAVE_BORDERS       
+          Sprites::drawOverwrite(x, y, pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + 3]), 0);
+#else
+          Sprites::drawExternalMask(x, y, pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + 3]), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_MASK_OFFSET + 3]), 0, 0);
+#endif
           _enabled = false;
           break;
         
@@ -230,11 +241,11 @@ void Enemy::renderImage() {
 	
         case 1:
         case 3:
-          Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET]), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_MASK_OFFSET]), 0, 0);
+          Sprites::drawExternalMask(x, y, pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET]), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_MASK_OFFSET]), 0, 0);
           break;
 
         case 2:
-          Sprites::drawExternalMask(_x.getInteger(), _y.getInteger(), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + 1]), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_MASK_OFFSET + 1]), 0, 0);
+          Sprites::drawExternalMask(x, y, pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_OFFSET + 1]), pgm_read_word_near(&_bitmaps[IMAGES_EXPLOSION_MASK_OFFSET + 1]), 0, 0);
           break;
 
       }

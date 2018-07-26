@@ -10,10 +10,10 @@ class Bullet {
 
     void move();
      
-    const uint8_t getX() const;
-    const uint8_t getY() const;
-    const Direction getDirection() const;
-    const bool getEnabled() const;
+    uint8_t getX();
+    uint8_t getY();
+    Direction getDirection();
+    bool getEnabled();
 
     void setX(const uint8_t value);
     void setY(const uint8_t value);
