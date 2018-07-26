@@ -25,7 +25,11 @@ Enemy::Enemy(const EnemyType type,
 
 const Rect Enemy::getRect() const {
 
+  #ifndef PLANES_HAVE_BORDERS
   return (Rect){ _x.getInteger(), _y.getInteger(), pgm_read_byte(pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(Direction::West)])), pgm_read_byte(pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(Direction::West) + 1])) };
+  #else
+  return (Rect){ _x.getInteger() + 1, _y.getInteger() + 1, pgm_read_byte(pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(Direction::West)])) - 2, pgm_read_byte(pgm_read_word_near(&_bitmaps[static_cast<uint8_t>(Direction::West) + 1])) + 2 };
+  #endif
 
 }
 

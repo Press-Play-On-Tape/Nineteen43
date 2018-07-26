@@ -7,7 +7,7 @@
 
 //#define ORIENTATION_HORIZONTAL
 #define ORIENTATION_VERTICAL
-
+#define PLANES_HAVE_BORDERS
 
 // Game States ..
 
@@ -81,10 +81,18 @@
 #define PLAYER_BULLETS_MAX              15
 #define PLAYER_HIT_BULLET_DECREMENT     0.25 
 #define PLAYER_HIT_PLANE_DECREMENT      0.05 
+
+#ifndef PLANES_HAVE_BORDERS
 #define PLAYER_WIDTH                    16
 #define PLAYER_WIDTH_HALF               8
 #define PLAYER_HEIGHT                   17
 #define PLAYER_HEIGHT_HALF              8
+#else
+#define PLAYER_WIDTH                    18
+#define PLAYER_WIDTH_HALF               9
+#define PLAYER_HEIGHT                   19
+#define PLAYER_HEIGHT_HALF              9
+#endif
 
 #define ENEMY_BULLETS_MAX               10
 #define ENEMY_NO_BULLETS_FIRED_MAX      3

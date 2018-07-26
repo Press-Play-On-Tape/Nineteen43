@@ -10,7 +10,8 @@
  * -----------------------------------------------------------------------------------------------------------------------------
  */
 
-const uint8_t PROGMEM mission_00[] = { 14, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+//const uint8_t PROGMEM mission_00[] = { 14, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+const uint8_t PROGMEM mission_00[] = { 1, 0 };
 const uint8_t PROGMEM mission_01[] = { 14, 7, 8, 9, 13, 0, 1, 2, 3, 10, 11, 12, 4, 5, 6 };
 const uint8_t PROGMEM mission_02[] = { 14, 0, 2, 4, 6, 8, 10, 12, 1, 3, 5, 7, 9, 11, 13 };
 const uint8_t PROGMEM mission_03[] = { 14, 2, 1, 7, 10, 4, 12, 0, 8, 9, 13, 3, 11, 5, 6,};
@@ -21,7 +22,7 @@ const uint8_t PROGMEM mission_04[] = { 14, 2, 1, 7, 10, 4, 12, 0, 8, 9, 13, 3, 1
 /* -----------------------------------------------------------------------------------------------------------------------------
  *  Formations
  *
- *  Format:  [Enemy Type],             - 0 solid, 1 hollow, 2 bomber, 3 boat
+ *  Format:  [Enemy Type],             - 0 solid, 1 hollow, 2 bomber, 5 boat
  *           [Sequence Index],   
  *           [X Offset], [Y Offset],
  *           [Delay Start],           
@@ -122,8 +123,8 @@ const int8_t PROGMEM formation_09[] = {
 
 const int8_t PROGMEM formation_10[] = {
   5, 
-  (uint8_t)EnemyType::Boat, 0, 0, 14, 4, false, false, 10,
-  (uint8_t)EnemyType::Boat, 0, 0, -32, 62, false, false, 10,
+  (uint8_t)EnemyType::Boat, 0, 0, 14, 4, false, false, 5,
+  (uint8_t)EnemyType::Boat, 0, 0, -32, 62, false, false, 5,
   (uint8_t)EnemyType::Zero, 2, -16, -48, 0, false, false, 1,
   (uint8_t)EnemyType::Zero, 2, -16, -48, 35, false, false, 1,
   (uint8_t)EnemyType::Zero, 2, -16, -48, 70, false, false, 1,

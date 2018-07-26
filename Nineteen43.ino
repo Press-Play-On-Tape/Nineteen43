@@ -20,6 +20,7 @@
 #include "Images/Images_Player.h"
 #include "Images/Images_Scoreboard.h"
 #include "Images/Images_Splash.h"
+#include "Images/Images_Ground.h"
 #include "Images/Images_Arrays.h"
 
 #ifdef ORIENTATION_HORIZONTAL
@@ -124,7 +125,7 @@ void setup() {
  */
 void loop() {
 
-  if (!(arduboy.nextFrame())) return;
+  if (!(arduboy.nextFrameDEV())) return;
   arduboy.clear();
   arduboy.pollButtons();
 
@@ -470,6 +471,17 @@ void game_init() {
 }
 
 
+#ifdef ORIENTATION_VERTICAL
+
+int16_t groundLowerX = 0;
+uint8_t groundLowerY1 = 48;
+uint8_t groundLowerY2 = 48;
+
+int16_t sailboatX = 47;
+uint8_t sailboatY = 23;
+
+#endif
+
 /* -----------------------------------------------------------------------------------------------------------------------------
  *  Let's play !
  * -----------------------------------------------------------------------------------------------------------------------------
@@ -486,6 +498,8 @@ void game_loop() {
   #ifdef ORIENTATION_VERTICAL
     uint8_t offsetY = (mission > 99 ? 0 : (mission > 9 ? 3 : 6));
     uint8_t offsetNumber = (mission > 99 ? 46 : (mission > 9 ? 44 : 41));
+
+    renderScenery();
   #endif
   
   switch (intro) {
@@ -1524,11 +1538,16 @@ void renderEndOfMission() {
   for (uint8_t i = 0; i < 128; ++i) {
 
     arduboy.clear();
+
+    #ifdef ORIENTATION_VERTICAL
+    renderScenery();
+    #endif
+
     Sprites::drawOverwrite(player.getX().getInteger() + i, player.getY().getInteger(), p38_0, 0);
     renderScoreboard();
     arduboy.display();
     delay(10);
-      
+
   }
 
 }
@@ -1688,3 +1707,24 @@ uint16_t EEPROMReadInt(int address) {
 }
 
 
+
+void renderScenery() {
+
+      // Draw ground ..
+
+    Sprites::drawOverwrite(groundLowerX, groundLowerY1, Ground_Bottom, 0);
+    Sprites::drawOverwrite(groundLowerX + 128, groundLowerY1, Ground_Bottom, 0);
+
+    Sprites::drawOverwrite(sailboatX, sailboatY, Sail_Boat, 0);
+
+    if (arduboy.everyXFrames(2)) {
+      groundLowerX--;
+      if (groundLowerX == -128) groundLowerX = 0;
+      sailboatX--;
+      if (sailboatX == -40) {
+        sailboatX = random(128, 250);
+        sailboatY = random(0, 32);
+      }
+    }
+
+}
