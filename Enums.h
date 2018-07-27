@@ -8,6 +8,8 @@
 //#define ORIENTATION_HORIZONTAL
 #define ORIENTATION_VERTICAL
 #define PLANES_HAVE_BORDERS
+#define HAS_SCENERY
+
 
 // Game States ..
 

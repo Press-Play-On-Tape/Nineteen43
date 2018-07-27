@@ -5,13 +5,60 @@
 
 /* -----------------------------------------------------------------------------------------------------------------------------
  *  Missions
- *
- *  Format:  [Number of formations], [Formation Index 1], [Formation Index 2], .. 
+ *  
+ *  Format:  [Number of formations], 
+ *           [Upper_Scenery] | [Lower_Scenery] | [Formation Index 1], 
+ *           [Upper_Scenery] | [Lower_Scenery] | [Formation Index 2], .. 
  * -----------------------------------------------------------------------------------------------------------------------------
  */
 
-//const uint8_t PROGMEM mission_00[] = { 14, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
-const uint8_t PROGMEM mission_00[] = { 1, 0 };
+#ifdef HAS_SCENERY
+
+#define SCENERY_MASK_NONE  0b00001111;
+#define SCENERY_MASK_LOWER 0b00110000;
+#define SCENERY_MASK_UPPER 0b11000000;
+
+#define SCENERY_LOWER_NONE 0b00000000;
+#define SCENERY_LOWER_INCR 0b00010000;
+#define SCENERY_LOWER_DECR 0b00100000;
+#define SCENERY_LOWER_FULL 0b00110000;
+
+#define SCENERY_UPPER_NONE 0b00000000;
+#define SCENERY_UPPER_INCR 0b01000000;
+#define SCENERY_UPPER_DECR 0b10000000;
+#define SCENERY_UPPER_FULL 0b11000000;
+
+#else
+
+#define SCENERY_LOWER_NONE 0b00000000;
+#define SCENERY_LOWER_INCR 0b00000000;
+#define SCENERY_LOWER_DECR 0b00000000;
+#define SCENERY_LOWER_FULL 0b00000000;
+
+#define SCENERY_UPPER_NONE 0b00000000;
+#define SCENERY_UPPER_INCR 0b00000000;
+#define SCENERY_UPPER_DECR 0b00000000;
+#define SCENERY_UPPER_FULL 0b00000000;
+
+#endif
+
+const uint8_t PROGMEM mission_00[] = { 
+  14, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_INCR | 0, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 1, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 2, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 3, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 4, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 5, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 6, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 7, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 8, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 9, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 10, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 11, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 12, 
+  SCENERY_UPPER_NONE | SCENERY_LOWER_FULL | 13 };
+
 const uint8_t PROGMEM mission_01[] = { 14, 7, 8, 9, 13, 0, 1, 2, 3, 10, 11, 12, 4, 5, 6 };
 const uint8_t PROGMEM mission_02[] = { 14, 0, 2, 4, 6, 8, 10, 12, 1, 3, 5, 7, 9, 11, 13 };
 const uint8_t PROGMEM mission_03[] = { 14, 2, 1, 7, 10, 4, 12, 0, 8, 9, 13, 3, 11, 5, 6,};

@@ -92,6 +92,11 @@ SQ7x8 obstacleBulletsValue = BULLETS_MAX;
 SQ7x8 obstacleHealthValue = HEALTH_MAX;
 SQ7x8 obstacleFuelValue = FUEL_MAX;
 
+#ifdef HAS_SCENERY
+uint8_t sceneryUpper = SCENERY_LOWER_NONE;
+uint8_t sceneryLower = SCENERY_LOWER_NONE;
+#endif
+
 
 /* -----------------------------------------------------------------------------------------------------------------------------
  *  Setup
@@ -132,31 +137,31 @@ void loop() {
   switch (gameState) {
 
     case STATE_INTRO_INIT:
-      intro_init();
+      introInit();
       break;
 
     case STATE_INTRO_LOOP:
-      intro_loop();
+      introLoop();
       break;
 
     case STATE_GAME_INIT:
-      game_init();
+      gameInit();
       break;
 
     case STATE_GAME_LOOP:
-      game_loop();
+      gameLoop();
       break;
 
     case STATE_GAME_END_OF_MISSION:
-      end_of_mission();
+      endOfMission();
       break;
 
     case STATE_GAME_END_OF_GAME:
-      end_of_game();
+      endOfGame();
       break;
 
     case STATE_CREDITS_INIT:
-      credits_init();
+      creditsInit();
       break;
 
     case STATE_CREDITS_LOOP:
@@ -172,7 +177,7 @@ void loop() {
  *  Introduction loop initialisation ..
  * -----------------------------------------------------------------------------------------------------------------------------
  */
-void intro_init() {
+void introInit() {
 
   mission = 0;                            
   missionIdx = 0;
@@ -197,7 +202,7 @@ void intro_init() {
  *  Credits loop initialisation ..
  * -----------------------------------------------------------------------------------------------------------------------------
  */
-void credits_init() {
+void creditsInit() {
 
   #ifdef ORIENTATION_HORIZONTAL
     intro = -32;
@@ -290,7 +295,7 @@ void credits_loop() {
  *  Introduction loop ..
  * -----------------------------------------------------------------------------------------------------------------------------
  */
-void intro_loop() {
+void introLoop() {
 
   // horizontal
 
@@ -440,7 +445,7 @@ void intro_loop() {
  *  Initialize a new game ready for play.
  * -----------------------------------------------------------------------------------------------------------------------------
  */
-void game_init() {
+void gameInit() {
 
   for (uint8_t i = 0; i < NUMBER_OF_ENEMIES; ++i) {
     enemies[i].setEnabled(false);
@@ -486,7 +491,7 @@ uint8_t sailboatY = 23;
  *  Let's play !
  * -----------------------------------------------------------------------------------------------------------------------------
  */
-void game_loop() {
+void gameLoop() {
 
   //arduboy.clear();
 
@@ -498,8 +503,9 @@ void game_loop() {
   #ifdef ORIENTATION_VERTICAL
     uint8_t offsetY = (mission > 99 ? 0 : (mission > 9 ? 3 : 6));
     uint8_t offsetNumber = (mission > 99 ? 46 : (mission > 9 ? 44 : 41));
-
-    renderScenery();
+    #ifdef HAS_SCENERY
+      renderScenery();
+    #endif
   #endif
   
   switch (intro) {
@@ -685,7 +691,7 @@ void game_loop() {
  *  End of mission loop ..
  * -----------------------------------------------------------------------------------------------------------------------------
  */
-void end_of_mission() {
+void endOfMission() {
 
   uint16_t missionScore = player.getScore();
   uint16_t grandScore = player.getGrandScore();
@@ -816,7 +822,7 @@ void end_of_mission() {
  *  End of mission loop ..
  * -----------------------------------------------------------------------------------------------------------------------------
  */
-void end_of_game() {
+void endOfGame() {
 
   uint16_t playerScore = player.getGrandScore();
   uint16_t high = EEPROMReadInt(EEPROM_SCORE + (level * 2));
@@ -1010,7 +1016,18 @@ void launchMission_FirstFormation(const uint8_t *mission) {
 
   mission_formations_left = pgm_read_byte(&mission[missionIdx++]);
   mission_formations = mission_formations_left;
+
+  #ifdef HAS_SCENERY
+  {
+    uint8_t formationPlusScenery = pgm_read_byte(&mission[missionIdx++]);
+    formation = formationPlusScenery & SCENERY_MASK_NONE;
+    sceneryUpper = formation & SCENERY_MASK_UPPER;
+    sceneryLower = formation & SCENERY_MASK_LOWER;
+  }
+  #else
   formation = pgm_read_byte(&mission[missionIdx++]);
+  #endif
+
   launchFormation(formations[formation]);
   --mission_formations_left;
 
@@ -1032,8 +1049,18 @@ void launchMission_FirstFormation(const uint8_t *mission) {
  * -----------------------------------------------------------------------------------------------------------------------------
  */
 void launchMission_NextFormation(const uint8_t *mission) {
-    
+  
+  #ifdef HAS_SCENERY
+  {
+    uint8_t formationPlusScenery = pgm_read_byte(&mission[missionIdx++]);
+    formation = formationPlusScenery & SCENERY_MASK_NONE;
+    sceneryUpper = formation & SCENERY_MASK_UPPER;
+    sceneryLower = formation & SCENERY_MASK_LOWER;
+  }
+  #else
   formation = pgm_read_byte(&mission[missionIdx++]);
+  #endif
+
   launchFormation(formations[formation]);
   --mission_formations_left;
 
@@ -1711,7 +1738,7 @@ uint16_t EEPROMReadInt(int address) {
 }
 
 
-
+#ifdef HAS_SCENERY
 void renderScenery() {
 
       // Draw ground ..
@@ -1732,3 +1759,4 @@ void renderScenery() {
     }
 
 }
+#endif
