@@ -22,8 +22,8 @@ class Obstacle : public Base {
     void setValue(SQ7x8 value);
     void setSpeed(SQ7x8 value);
     void setObstacleType(ObstacleType value);
-    void setBitmap(uint8_t *value);
-    void setMask(uint8_t *value);
+    void setBitmap(const uint8_t *value);
+    void setMask(const uint8_t *value);
          
     void move();
     void renderImage();  

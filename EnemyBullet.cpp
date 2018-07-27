@@ -42,6 +42,8 @@ void EnemyBullet::move() {
       _x = _x - 2;
       _y = _y - 2;
       break;
+
+    default: break;
       
   }
   

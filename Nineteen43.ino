@@ -20,8 +20,11 @@
 #include "Images/Images_Player.h"
 #include "Images/Images_Scoreboard.h"
 #include "Images/Images_Splash.h"
-#include "Images/Images_Ground.h"
 #include "Images/Images_Arrays.h"
+
+#ifdef HAS_SCENERY
+#include "Images/Images_Scenery.h"
+#endif
 
 #ifdef ORIENTATION_HORIZONTAL
   Arduboy2 arduboy;
@@ -76,10 +79,10 @@ uint8_t enemyShotCountdown = 5;
 uint16_t level = 0;
 bool showLevel = false;
 
-uint8_t mission = 0;                             // Mission currently being played
-uint8_t missionIdx = 0;                          // Byte index within current mission
-uint8_t mission_formations = 0;                  // Number of formations in the current mission.
-uint8_t mission_formations_left = 0;             // Number of formations left within current mission.
+uint8_t mission = 0;                                        // Mission currently being played
+uint8_t missionIdx = 0;                                     // Byte index within current mission
+uint8_t mission_formations = 0;                             // Number of formations in the current mission.
+uint8_t mission_formations_left = 0;                        // Number of formations left within current mission.
 uint8_t formation = 0;
 uint8_t gameState = STATE_INTRO_INIT;
 int16_t intro;
@@ -93,8 +96,14 @@ SQ7x8 obstacleHealthValue = HEALTH_MAX;
 SQ7x8 obstacleFuelValue = FUEL_MAX;
 
 #ifdef HAS_SCENERY
-uint8_t sceneryUpper = SCENERY_LOWER_NONE;
+#define NUMBER_OF_SCENERY_TILES 5
+#define SCENERY_TILE_WIDTH 32
+uint8_t sceneryUpper = SCENERY_UPPER_NONE;                  // Defines the current 'trend' for the scenery - NONE, FULL, INCR, DECR
 uint8_t sceneryLower = SCENERY_LOWER_NONE;
+
+SceneryInfo upperSceneryInfo[NUMBER_OF_SCENERY_TILES];      // Scenery tiles are rendered across the screen with offset.
+SceneryInfo lowerSceneryInfo[NUMBER_OF_SCENERY_TILES];
+uint8_t sceneryOffset;
 #endif
 
 
@@ -1741,16 +1750,111 @@ uint16_t EEPROMReadInt(int address) {
 #ifdef HAS_SCENERY
 void renderScenery() {
 
-      // Draw ground ..
+    // Draw ground ..
 
-    Sprites::drawOverwrite(groundLowerX, groundLowerY1, Ground_Bottom, 0);
-    Sprites::drawOverwrite(groundLowerX + 128, groundLowerY1, Ground_Bottom, 0);
+    for (uint8_t x = 0; x < NUMBER_OF_SCENERY_TILES; x--) {
 
+      if (upperSceneryInfo[x].tile > 0) {
+        Sprites::drawOverwrite(-sceneryOffset + (SCENERY_TILE_WIDTH * x), upperSceneryInfo[x].offset, upper_scenery_images[x], 0);
+      }
+
+      if (lowerSceneryInfo[x].tile > 0) {
+        Sprites::drawOverwrite(-sceneryOffset + (SCENERY_TILE_WIDTH * x), HEIGHT + lowerSceneryInfo[x].offset, lower_scenery_images[x], 0);
+      }
+
+    }
+  
     Sprites::drawOverwrite(sailboatX, sailboatY, Sail_Boat, 0);
 
     if (arduboy.everyXFrames(2)) {
-      groundLowerX--;
-      if (groundLowerX == -128) groundLowerX = 0;
+
+      sceneryOffset++;
+
+      if (sceneryOffset == SCENERY_TILE_WIDTH) {
+        
+
+        // Shuffle the scenery across ..
+
+        sceneryOffset = 0;
+        for (uint8_t x = 0; x < NUMBER_OF_SCENERY_TILES - 1; x--) {
+          upperSceneryInfo[x] = upperSceneryInfo[x + 1];
+          lowerSceneryInfo[x] = lowerSceneryInfo[x + 1];
+        }
+
+
+        // Choose a new upper tile ..
+
+        uint8_t updateTile = NUMBER_OF_SCENERY_TILES - 1;
+
+        switch (sceneryUpper) {
+
+          case SCENERY_UPPER_NONE:
+          case SCENERY_UPPER_DECR:
+            if (lowerSceneryInfo[updateTile].offset < 24) {
+              lowerSceneryInfo[updateTile].offset++;
+              lowerSceneryInfor[updateTile].tile = random(1, 4);
+            }
+            else {
+              lowerSceneryInfor[updateTile].tile = 0;
+            }
+            break;
+
+          case SCENERY_UPPER_INCR:
+            lowerSceneryInfor[updateTile].tile = random(1, 4);
+            if (lowerSceneryInfo[updateTile].offset > -24) {
+              lowerSceneryInfo[updateTile].offset--;
+            }
+            break;
+
+          case SCENERY_UPPER_FULL:
+            {
+              int8_t minimum = (lowerSceneryInfo[updateTile].offset > -24 ? -1 : 0);
+              int8_t maximum = (lowerSceneryInfo[updateTile].offset < 24 ? 2 : 1);
+              
+              lowerSceneryInfor[updateTile].tile = random(1, 4);
+              lowerSceneryInfor[updateTile].offset = lowerSceneryInfor[updateTile].offset + random(minimum, maximum);
+            }
+            break;
+
+        }
+        
+
+        // Choose a new lower tile ..
+
+        switch (sceneryLower) {
+
+          case SCENERY_LOWER_NONE:
+          case SCENERY_LOWER_DECR:
+            if (lowerSceneryInfo[updateTile].offset < 24) {
+              lowerSceneryInfo[updateTile].offset++;
+              lowerSceneryInfo[updateTile].tile = random(1, 4);
+            }
+            else {
+              lowerSceneryInfor[updateTile].tile = 0;
+            }
+            break;
+
+          case SCENERY_LOWER_INCR:
+            lowerSceneryInfo[updateTile].tile = random(1, 4);
+            if (lowerSceneryInfo[updateTile].offset > -24) {
+              lowerSceneryInfo[updateTile].offset--;
+            }
+            break;
+
+          case SCENERY_LOWER_FULL:
+            {
+              int8_t minimum = (lowerSceneryInfo[updateTile].offset > -24 ? -1 : 0);
+              int8_t maximum = (lowerSceneryInfo[updateTile].offset < 24 ? 2 : 1);
+              
+              lowerSceneryInfo[updateTile].tile = random(1, 4);
+              lowerSceneryInfo[updateTile].offset = lowerSceneryInfo[updateTile].offset + random(minimum, maximum);
+            }
+            break;
+
+        }
+
+      }
+
       sailboatX--;
       if (sailboatX == -40) {
         sailboatX = random(128, 250);
@@ -1760,3 +1864,5 @@ void renderScenery() {
 
 }
 #endif
+
+

@@ -91,6 +91,8 @@ void Bullet::move() {
       --_x;
       --_y;
       break;
+
+    default: break;
       
   }
 

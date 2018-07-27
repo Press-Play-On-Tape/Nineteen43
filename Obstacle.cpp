@@ -66,13 +66,13 @@ void Obstacle::setObstacleType(ObstacleType value) {
   
 }
 
-void Obstacle::setBitmap(uint8_t *value) {
+void Obstacle::setBitmap(const uint8_t *value) {
 
   _bitmap = value;
   
 }
 
-void Obstacle::setMask(uint8_t *value) {
+void Obstacle::setMask(const uint8_t *value) {
 
   _mask = value;
   

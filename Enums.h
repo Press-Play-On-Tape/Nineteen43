@@ -156,6 +156,13 @@
 #define ROTATE_Q2_MIN                   (SQ15x16)2.413976
 #define ROTATE_Q2_MAX                   (SQ15x16)999
 
+#ifdef HAS_SCENERY
+struct SceneryInfo {
+  int8_t offset;
+  uint8_t tile;
+};
+#endif
+
 enum class EnemyType : uint8_t {
   Zero,
   ZeroHollow,

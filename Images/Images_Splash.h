@@ -1,4 +1,4 @@
-#pragma omce
+#pragma once
 
 #ifdef ORIENTATION_HORIZONTAL
 
