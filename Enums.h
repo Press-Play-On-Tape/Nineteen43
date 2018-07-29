@@ -5,10 +5,6 @@
 #include <Arduboy2.h>
 
 
-//#define ORIENTATION_HORIZONTAL
-#define ORIENTATION_VERTICAL
-
-
 // Game States ..
 
 #define STATE_INTRO_INIT                 0
