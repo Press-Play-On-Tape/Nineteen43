@@ -1,5 +1,5 @@
 #include "Plane.h"
-#include "Arduboy2.h"
+#include "Arduboy2Ext.h"
 #include "Sprites.h"
 #include "Enums.h"
 #include "FixedPoints.h"

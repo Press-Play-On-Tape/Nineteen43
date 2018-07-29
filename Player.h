@@ -1,6 +1,6 @@
 #pragma once
  
-#include "Arduboy2.h"
+#include "Arduboy2Ext.h"
 #include "Sprites.h"
 #include "Arduino.h"
 #include "Enums.h"

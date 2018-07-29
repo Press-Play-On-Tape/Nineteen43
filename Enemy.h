@@ -34,7 +34,7 @@ class Enemy : public Plane {
     void setEnemyType(EnemyType value);
     void setDirection(Direction value);
     void setTurretDirection(Direction value);
-    void setStartingPos(int8_t *startingPos);
+    void setStartingPos(const int8_t *startingPos);
     void setOffsetX(int8_t value);
     void setOffsetY(int8_t value);
     void setDelayStart(uint8_t value);
@@ -60,7 +60,7 @@ class Enemy : public Plane {
     bool _invertY;
     uint8_t _delayStart;
     int16_t _currentPos;
-    int8_t *_startingPos;
+    const int8_t *_startingPos;
 
     
     // Store the details of a 'repeat' step in a sequence ..

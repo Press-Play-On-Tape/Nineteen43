@@ -1,4 +1,4 @@
-#include <Arduboy2.h>
+#include "Arduboy2Ext.h"
 #include <ArduboyTones.h>
 #include <EEPROM.h>
 
@@ -20,6 +20,7 @@
 #include "Images/Images_Player.h"
 #include "Images/Images_Scoreboard.h"
 #include "Images/Images_Splash.h"
+#include "Images/Images_Scenery.h"
 #include "Images/Images_Arrays.h"
 
 #ifdef HAS_SCENERY
@@ -27,11 +28,11 @@
 #endif
 
 #ifdef ORIENTATION_HORIZONTAL
-  Arduboy2 arduboy;
+  Arduboy2Ext arduboy;
 #endif
 
 #ifdef ORIENTATION_VERTICAL
-  Arduboy2Base arduboy;
+  Arduboy2Ext arduboy;
 #endif
 
 ArduboyTones sound(arduboy.audio.enabled);
@@ -76,7 +77,7 @@ const uint8_t scrollIncrement = 2;
 
 uint16_t obstacleLaunchCountdown = OBSTACLE_LAUNCH_DELAY_MIN;
 uint8_t enemyShotCountdown = 5;
-uint16_t level = 0;
+uint8_t level = 0;
 bool showLevel = false;
 
 uint8_t mission = 0;                                        // Mission currently being played
@@ -96,15 +97,31 @@ SQ7x8 obstacleHealthValue = HEALTH_MAX;
 SQ7x8 obstacleFuelValue = FUEL_MAX;
 
 #ifdef HAS_SCENERY
-#define NUMBER_OF_SCENERY_TILES 5
-#define SCENERY_TILE_WIDTH 32
-uint8_t sceneryUpper = SCENERY_UPPER_NONE;                  // Defines the current 'trend' for the scenery - NONE, FULL, INCR, DECR
-uint8_t sceneryLower = SCENERY_LOWER_NONE;
 
-SceneryInfo upperSceneryInfo[NUMBER_OF_SCENERY_TILES];      // Scenery tiles are rendered across the screen with offset.
-SceneryInfo lowerSceneryInfo[NUMBER_OF_SCENERY_TILES];
-uint8_t sceneryOffset;
+  #define NUMBER_OF_SCENERY_TILES 5
+  #define NUMBER_OF_SCENERY_ITEMS 4
+  #define SCENERY_TILE_WIDTH 32
+
+  uint8_t sceneryUpper = SCENERY_UPPER_NONE;                  // Defines the current 'trend' for the scenery - NONE, FULL, INCR, DECR
+  uint8_t sceneryLower = SCENERY_LOWER_NONE;
+
+  SceneryInfo upperSceneryInfo[NUMBER_OF_SCENERY_TILES];      // Scenery tiles are rendered across the screen with offset.
+  SceneryInfo lowerSceneryInfo[NUMBER_OF_SCENERY_TILES];
+  uint8_t sceneryOffset;
+
+  SceneryItem sceneryItems[NUMBER_OF_SCENERY_ITEMS];
+
 #endif
+
+#ifdef HAS_SCENERY
+void initSceneryItems() {
+  sceneryItems[0] = { 128, 20, SceneryElement::Boat};
+  sceneryItems[1] = { 176, 25, SceneryElement::Wave1};
+  sceneryItems[2] = { 224, 30, SceneryElement::Wave2};
+  sceneryItems[3] = { 272, 35, SceneryElement::Wave1};
+}
+#endif
+
 
 
 /* -----------------------------------------------------------------------------------------------------------------------------
@@ -125,7 +142,7 @@ void setup() {
   obstacleFuelValue = FUEL_MAX;
 
   frameRate = INIT_FRAME_RATE;
-  level = (EEPROMReadInt(EEPROM_LEVEL) < 0 || EEPROMReadInt(EEPROM_LEVEL) > 2 ? 0 : EEPROMReadInt(EEPROM_LEVEL));
+  level = EEPROM.read(EEPROM_LEVEL);
   
   arduboy.setFrameRate(frameRate);
   arduboy.initRandomSeed();
@@ -139,7 +156,7 @@ void setup() {
  */
 void loop() {
 
-  if (!(arduboy.nextFrameDEV())) return;
+  if (!(arduboy.nextFrame())) return;
   arduboy.clear();
   arduboy.pollButtons();
 
@@ -162,13 +179,22 @@ void loop() {
       break;
 
     case STATE_GAME_END_OF_MISSION:
-      endOfMission();
+      #ifdef ORIENTATION_HORIZONTAL
+        endOfMission();
+      #else
+        endOfSequence();
+      #endif
       break;
 
     case STATE_GAME_END_OF_GAME:
-      endOfGame();
+      #ifdef ORIENTATION_HORIZONTAL
+        endOfGame();
+      #else
+        endOfSequence();
+      #endif
       break;
 
+    #ifdef HAS_CREDITS
     case STATE_CREDITS_INIT:
       creditsInit();
       break;
@@ -176,6 +202,7 @@ void loop() {
     case STATE_CREDITS_LOOP:
       credits_loop();
       break;
+    #endif
 
   }
 
@@ -211,6 +238,7 @@ void introInit() {
  *  Credits loop initialisation ..
  * -----------------------------------------------------------------------------------------------------------------------------
  */
+#ifdef HAS_CREDITS
 void creditsInit() {
 
   #ifdef ORIENTATION_HORIZONTAL
@@ -222,12 +250,14 @@ void creditsInit() {
   gameState = STATE_CREDITS_LOOP;
 
 }
+#endif
 
 
 /* -----------------------------------------------------------------------------------------------------------------------------
  *  Credits loop ..
  * -----------------------------------------------------------------------------------------------------------------------------
  */
+#ifdef HAS_CREDITS
 void credits_loop() {
 
   #ifdef ORIENTATION_HORIZONTAL
@@ -268,13 +298,11 @@ void credits_loop() {
 
       while (!(arduboy.nextFrame())) {}
 
-      arduboy.clear();
+      Sprites::drawOverwrite(116, 12, credits_img, 0);
+      arduboy.drawVerticalDottedLine(0, HEIGHT, 110, WHITE);
+      arduboy.drawVerticalDottedLine(0, HEIGHT, 127, WHITE);
 
-      Sprites::drawOverwrite(118, 12, credits_img, 0);
-      drawVerticalDottedLine(0, HEIGHT, 114, WHITE);
-      drawVerticalDottedLine(0, HEIGHT, 127, WHITE);
-
-      arduboy.fillRect(114, i - 18, 127, 200, BLACK);
+      arduboy.fillRect(110, i - 18, 127, 200, BLACK);
       Sprites::drawOverwrite(104, i - 18, zero_S, 0);
       Sprites::drawOverwrite(113, i, zero_S, 0);
     
@@ -287,7 +315,7 @@ void credits_loop() {
     Sprites::drawOverwrite(53, 3, pharap, 0);
     Sprites::drawOverwrite(0, 3, aButton_continue, 0);
     
-    arduboy.display();
+    arduboy.display(true);
 
   #endif
 
@@ -298,6 +326,7 @@ void credits_loop() {
   gameState = STATE_INTRO_INIT;
   
 }
+#endif
 
 
 /* -----------------------------------------------------------------------------------------------------------------------------
@@ -368,14 +397,14 @@ void introLoop() {
 
   #endif
 
-  arduboy.display();
+  arduboy.display(true);
 
   #ifdef ORIENTATION_HORIZONTAL
 
     if (arduboy.justPressed(UP_BUTTON)) {
 
       if (level < 2) level++;
-      EEPROMWriteInt(EEPROM_LEVEL, level);
+      EEPROM.update(EEPROM_LEVEL, level);
       showLevel = true;
 
     }
@@ -383,16 +412,18 @@ void introLoop() {
     if (arduboy.justPressed(DOWN_BUTTON)) {
 
       if (level > 0) level--;
-      EEPROMWriteInt(EEPROM_LEVEL, level);
+      EEPROM.update(EEPROM_LEVEL, level);
       showLevel = true;
 
     }
 
+    #ifdef HAS_CREDITS
     if (arduboy.justPressed(LEFT_BUTTON) || arduboy.justPressed(RIGHT_BUTTON)) {
 
       gameState = STATE_CREDITS_INIT;   
 
     }
+    #endif
     
   #endif
 
@@ -401,7 +432,7 @@ void introLoop() {
     if (arduboy.justPressed(RIGHT_BUTTON)) {
 
       if (level < 2) level++;
-      EEPROMWriteInt(EEPROM_LEVEL, level);
+      EEPROM.update(EEPROM_LEVEL, level);
       showLevel = true;
 
     }
@@ -409,16 +440,18 @@ void introLoop() {
     if (arduboy.justPressed(LEFT_BUTTON)) {
 
       if (level > 0) level--;
-      EEPROMWriteInt(EEPROM_LEVEL, level);
+      EEPROM.update(EEPROM_LEVEL, level);
       showLevel = true;
 
     }
 
+    #ifdef HAS_CREDITS
     if (arduboy.justPressed(UP_BUTTON) || arduboy.justPressed(DOWN_BUTTON)) {
 
       gameState = STATE_CREDITS_INIT;   
 
     }
+    #endif
 
   #endif
 
@@ -513,13 +546,21 @@ void gameLoop() {
     uint8_t offsetY = (mission > 99 ? 0 : (mission > 9 ? 3 : 6));
     uint8_t offsetNumber = (mission > 99 ? 46 : (mission > 9 ? 44 : 41));
     #ifdef HAS_SCENERY
-      renderScenery();
+      renderScenery(arduboy.getFrameCount(2));
     #endif
   #endif
   
   switch (intro) {
 
-    case 2 ... 80:
+    case 80: 
+      initSceneryItems();
+
+      for (uint8_t x = 0; x < NUMBER_OF_SCENERY_TILES; x++) {
+        upperSceneryInfo[x].offset = 0;
+        lowerSceneryInfo[x].offset = 0;
+      }
+
+    case 2 ... 79:
 
       #ifdef ORIENTATION_HORIZONTAL
 
@@ -539,8 +580,8 @@ void gameLoop() {
         if (mission >= 99) Sprites::drawOverwrite(60, offsetNumber, numbers_vert, (mission + 1) / 100);
         if (mission >= 9)  Sprites::drawOverwrite(60, offsetNumber + 6, numbers_vert, ((mission + 1) / 10) % 10);
         Sprites::drawOverwrite(60, offsetNumber + 12, numbers_vert, (mission + 1) % 10);
-        drawVerticalDottedLine(offsetY, HEIGHT - offsetY, 57, WHITE);
-        drawVerticalDottedLine(offsetY, HEIGHT - offsetY, 69, WHITE);
+        arduboy.drawVerticalDottedLine(offsetY, HEIGHT - offsetY, 57, WHITE);
+        arduboy.drawVerticalDottedLine(offsetY, HEIGHT - offsetY, 69, WHITE);
 
       #endif
 
@@ -642,7 +683,7 @@ void gameLoop() {
   player.renderImage();
 
   renderScoreboard();
-  arduboy.display();
+  arduboy.display(true);
 
 
   // New wave ?
@@ -672,8 +713,8 @@ void gameLoop() {
         ++mission;
         intro = 40;
         sound.tones(mission_success);
-        renderEndOfMission();
         gameState = STATE_GAME_END_OF_MISSION;
+        renderEndOfMission();
         
       }
   
@@ -695,235 +736,6 @@ void gameLoop() {
 
 }
 
-
-/* -----------------------------------------------------------------------------------------------------------------------------
- *  End of mission loop ..
- * -----------------------------------------------------------------------------------------------------------------------------
- */
-void endOfMission() {
-
-  uint16_t missionScore = player.getScore();
-  uint16_t grandScore = player.getGrandScore();
-  uint16_t high = EEPROMReadInt(EEPROM_SCORE + (level * 2));
-  
-  if (grandScore > high) EEPROMWriteInt(EEPROM_SCORE + (level * 2), grandScore);
-
-  #ifdef ORIENTATION_HORIZONTAL
-    
-    for (int16_t i = -60; i < 129; i+=2) {
-
-      arduboy.clear();
-      
-      arduboy.setCursor(11, 10);
-      arduboy.print(F("Mission Successful"));
-      drawHorizontalDottedLine(9, 118, 7, WHITE);
-      drawHorizontalDottedLine(9, 118, 19, WHITE);
-      gameState = STATE_GAME_INIT;
-
-      arduboy.fillRect(i - 2, 5, 255, 20, BLACK);
-      Sprites::drawOverwrite(i + 48, 0, zero_E, 0);
-      Sprites::drawOverwrite(i + 30, 18, zero_E, 0);
-      Sprites::drawOverwrite(i , 5, p38_0, 0);
-    
-      arduboy.display();
-      delay(5);
-
-    }
-
-  #endif
-
-  #ifdef ORIENTATION_VERTICAL
-    
-    for (int16_t i = -20; i < 100; i++) {
-
-      while (!(arduboy.nextFrame())) {}
-
-      arduboy.clear();
-
-      Sprites::drawOverwrite(106, 2, mission_successful, 0);
-      drawVerticalDottedLine(0, HEIGHT, 102, WHITE);
-      drawVerticalDottedLine(0, HEIGHT, 127, WHITE);
-
-      arduboy.fillRect(102, i - 18, 127, 200, BLACK);
-      Sprites::drawOverwrite(102, i - 18, zero_S, 0);
-      Sprites::drawOverwrite(111, i, zero_S, 0);
-    
-      arduboy.display();
-      gameState = STATE_GAME_INIT;
-
-    }
-
-  #endif
-
-  #ifdef ORIENTATION_HORIZONTAL
-
-    arduboy.setCursor(14, 28);
-    arduboy.print(F("Mission Score "));
-    if (missionScore < 100) arduboy.print("0");
-    if (missionScore < 10)  arduboy.print("0");
-    arduboy.print(missionScore);
-
-    arduboy.setCursor(18, 40);
-    arduboy.print(F("Total Score "));
-    if (grandScore < 100) arduboy.print("0");
-    if (grandScore < 10)  arduboy.print("0");
-    arduboy.print(grandScore);
-    arduboy.display();
-
-    for (uint8_t i = 0; i < 120; ++i) {
-      delay(10);
-    }
-    arduboy.setCursor(34, 55);
-    arduboy.print(F("A Continue"));
-
-    
-    drawHorizontalDottedLine(34, 38, 53, WHITE);
-    drawHorizontalDottedLine(34, 38, 63, WHITE);
-
-  #endif
-
-  #ifdef ORIENTATION_VERTICAL
-
-    // Score ..
-    {
-      Sprites::drawOverwrite(61, 4, score_img, 0);
-      uint8_t digits[4] = {};
-      extractDigits(digits, missionScore);
-      
-      for (uint8_t i = 0, y = 56; i < 4; ++i, y -= 6) {
-        Sprites::drawSelfMasked(61, y, numbers_vert, digits[i]);
-      }
-      
-    }
-
-    // Total ..
-    {
-      Sprites::drawOverwrite(48, 4, total_img, 0);
-      uint8_t digits[4] = {};
-      extractDigits(digits, grandScore);
-      
-      for (uint8_t i = 0, y = 56; i < 4; ++i, y -= 6) {
-        Sprites::drawSelfMasked(48, y, numbers_vert, digits[i]);
-      }
-      
-    }
-
-    for (uint8_t i = 0; i < 120; ++i) {
-      delay(10);
-    }
-    Sprites::drawOverwrite(2, 3, aButton_continue, 0);
-
-  #endif
-
-  arduboy.display();
-
-  while (!arduboy.justPressed(A_BUTTON)) {
-    arduboy.pollButtons();
-    delay(100);
-  }
-
-  if (level == 0 && mission == 30) { gameState = STATE_GAME_END_OF_GAME; }
-  if (level == 1 && mission == 60) { gameState = STATE_GAME_END_OF_GAME; }
-  
-}
-
-/* -----------------------------------------------------------------------------------------------------------------------------
- *  End of mission loop ..
- * -----------------------------------------------------------------------------------------------------------------------------
- */
-void endOfGame() {
-
-  uint16_t playerScore = player.getGrandScore();
-  uint16_t high = EEPROMReadInt(EEPROM_SCORE + (level * 2));
-
-  #ifdef ORIENTATION_HORIZONTAL
-    
-    arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
-    Sprites::drawOverwrite((playerScore > 999 ? -3 : 0), 0, p38_3d, 0);
-    
-    arduboy.setTextBackground(WHITE);
-    arduboy.setTextColor(BLACK);
-    
-    arduboy.setCursor(74, 4);
-    arduboy.print(F("Game"));
-    arduboy.setCursor(101, 4);
-    arduboy.print(F("Over"));
-    drawHorizontalDottedLine(72, 124, 2, BLACK);
-    drawHorizontalDottedLine(72, 124, 12, BLACK);
-    
-    if (playerScore > high) {
-      EEPROMWriteInt(EEPROM_SCORE + (level * 2), playerScore);
-      high = playerScore;
-    }
-
-    if (playerScore > 999 || high > 999) {
-      arduboy.setCursor(74, 40);
-      arduboy.print(F("Scor"));
-      arduboy.setCursor(102, 40);
-      if (playerScore < 1000) arduboy.print("0");
-    }
-
-    else {
-      arduboy.setCursor(76, 40);
-      arduboy.print(F("Score"));
-      arduboy.setCursor(109, 40);
-    }
-        
-    if (playerScore < 100) arduboy.print("0");
-    if (playerScore < 10)  arduboy.print("0");
-    arduboy.print(playerScore);
-    
-    arduboy.setCursor((playerScore > 999 || high > 999 ? 72 : 76), 52);
-    arduboy.print(F("High"));
-    arduboy.setCursor((playerScore > 999 || high > 999 ? 102 : 109), 52);
-    if (high < 100) arduboy.print("0");
-    if (high < 10)  arduboy.print("0");
-    arduboy.print(high);
-
-  #endif
-
-
-  #ifdef ORIENTATION_VERTICAL
-
-    arduboy.fillRect(0, 0, WIDTH, HEIGHT, WHITE);  
-    Sprites::drawOverwrite(0, 0, p38_3d, 0);
-
-    Sprites::drawOverwrite(117, 8, game_over, 0);
-    drawVerticalDottedLine(0, HEIGHT, 113, BLACK);
-    drawVerticalDottedLine(0, HEIGHT, 126, BLACK);
-
-    // Score ..
-    {
-      Sprites::drawOverwrite(87, 4, score_White, 0);
-      uint8_t digits[4] = {};
-      extractDigits(digits, playerScore);
-      
-      for (uint8_t i = 0, y = 56; i < 4; ++i, y -= 6) {
-        Sprites::drawErase(87, y, numbers_vert, digits[i]);
-      }
-      
-    }
-
-    // Total ..
-    {
-      Sprites::drawOverwrite(74, 4, high_img, 0);
-      uint8_t digits[4] = {};
-      extractDigits(digits, high);
-      
-      for (uint8_t i = 0, y = 56; i < 4; ++i, y -= 6) {
-        Sprites::drawErase(74, y, numbers_vert, digits[i]);
-      }
-      
-    }
-
-  #endif
-
-  arduboy.display();
-
-  if (arduboy.justPressed(UP_BUTTON) && arduboy.justPressed(DOWN_BUTTON)) { initEEPROM(true); player.setGrandScore(0); }
-  if (arduboy.justPressed(A_BUTTON)) gameState = STATE_INTRO_INIT;
-
-}
 
 
 /* -----------------------------------------------------------------------------------------------------------------------------
@@ -1030,8 +842,8 @@ void launchMission_FirstFormation(const uint8_t *mission) {
   {
     uint8_t formationPlusScenery = pgm_read_byte(&mission[missionIdx++]);
     formation = formationPlusScenery & SCENERY_MASK_NONE;
-    sceneryUpper = formation & SCENERY_MASK_UPPER;
-    sceneryLower = formation & SCENERY_MASK_LOWER;
+    sceneryUpper = formationPlusScenery & SCENERY_MASK_UPPER;
+    sceneryLower = formationPlusScenery & SCENERY_MASK_LOWER;
   }
   #else
   formation = pgm_read_byte(&mission[missionIdx++]);
@@ -1063,8 +875,8 @@ void launchMission_NextFormation(const uint8_t *mission) {
   {
     uint8_t formationPlusScenery = pgm_read_byte(&mission[missionIdx++]);
     formation = formationPlusScenery & SCENERY_MASK_NONE;
-    sceneryUpper = formation & SCENERY_MASK_UPPER;
-    sceneryLower = formation & SCENERY_MASK_LOWER;
+    sceneryUpper = formationPlusScenery & SCENERY_MASK_UPPER;
+    sceneryLower = formationPlusScenery & SCENERY_MASK_LOWER;
   }
   #else
   formation = pgm_read_byte(&mission[missionIdx++]);
@@ -1573,10 +1385,10 @@ void renderEndOfMission() {
 
   for (uint8_t i = 0; i < 128; ++i) {
 
-    arduboy.clear();
+//    arduboy.clear();
 
     #ifdef ORIENTATION_VERTICAL
-    renderScenery();
+    renderScenery((arduboy.getFrameCount(2) + i) % 2);
     #endif
 
 #ifndef PLANES_HAVE_BORDERS
@@ -1585,7 +1397,7 @@ void renderEndOfMission() {
     Sprites::drawExternalMask(player.getX().getInteger() + i, player.getY().getInteger(), p38_0, p38_mask_0, 0, 0);
 #endif
     renderScoreboard();
-    arduboy.display();
+    arduboy.display(true);
     delay(20);
 
   }
@@ -1671,26 +1483,6 @@ void renderScoreboadGauge(const uint8_t imageX, const uint8_t imageY, const uint
  * ----------------------------------------------------------------------------
  */
 void drawHorizontalDottedLine(uint8_t x1, uint8_t x2, uint8_t y, uint8_t colour) {
-
-  for (int x3 = x1; x3 <= x2; x3+=2) {
-    arduboy.drawPixel(x3, y, colour);
-  }
-  
-}
-
-
-/* ----------------------------------------------------------------------------
- *  Draw a vertical dotted line. 
- */
-void drawVerticalDottedLine(uint8_t y1, uint8_t y2, uint8_t x, uint8_t colour) {
-
-  for (uint8_t y3 = y1; y3 <= y2; y3+=2) {
-    arduboy.drawPixel(x, y3, colour);
-  }
-  
-}
-
-
 /* ----------------------------------------------------------------------------
  *   Is the EEPROM initialised? 
  *   
@@ -1706,16 +1498,391 @@ void initEEPROM(bool forceOverwrite) {
 
   if (c1 != 52 || c2 != 51 || forceOverwrite) { 
   
-    EEPROM.update(EEPROM_START_C1, 52);
-    EEPROM.update(EEPROM_START_C2, 51);
+    uint16_t score = 0;
+    EEPROMWriteInt(EEPROM_START_C1, 52);
+    EEPROMWriteInt(EEPROM_START_C2, 51);
     EEPROMWriteInt(EEPROM_SCORE, 0);
-    EEPROMWriteInt(EEPROM_SCORE + 2, 0);
-    EEPROMWriteInt(EEPROM_SCORE + 4, 0);
-    EEPROMWriteInt(EEPROM_SCORE + 6, 0);
+    EEPROMWriteInt(EEPROM_SCORE + 2, score);
+    EEPROMWriteInt(EEPROM_SCORE + 4, score);
+    EEPROMWriteInt(EEPROM_SCORE + 6, score);
     
   }
 
 }
+
+
+
+#ifdef HAS_SCENERY
+
+#define SCENERY_TILE_DECR 1
+#define SCENERY_TILE_FLAT_BEGIN 2
+#define SCENERY_TILE_FLAT_END 6
+#define SCENERY_TILE_INCR 7
+
+#define SCENERY_LOWER_OFFSET_MIN -20    
+#define SCENERY_LOWER_OFFSET_MIN_PLUS_INC SCENERY_LOWER_OFFSET_MIN + 4       
+#define SCENERY_LOWER_OFFSET_MAX_MINUS_INC 20       
+#define SCENERY_LOWER_OFFSET_MAX SCENERY_LOWER_OFFSET_MAX_MINUS_INC + 4
+
+#define SCENERY_UPPER_OFFSET_MIN -24    
+#define SCENERY_UPPER_OFFSET_MIN_PLUS_INC SCENERY_UPPEROFFSET_MIN + 4       
+#define SCENERY_UPPER_OFFSET_MAX_MINUS_INC 20       
+#define SCENERY_UPPER_OFFSET_MAX SCENERY_UPPER_OFFSET_MAX_MINUS_INC + 4
+
+const int8_t lower_offsets[] = { -4, -4, 0,   0, 0, 4,    4, 0, 4 };
+const int8_t upper_offsets[] = { -4, 0, 0,   -4, 0, 0,    4, 4, 4 };
+
+
+void renderScenery(uint8_t frame) {
+
+
+    // Draw scenery elements ..
+
+    for (uint8_t x = 0; x < NUMBER_OF_SCENERY_ITEMS; x++) {
+
+      switch (sceneryItems[x].element) {
+
+        case SceneryElement::Wave1:
+          Sprites::drawSelfMasked(sceneryItems[x].x, sceneryItems[x].y, wave_01, 0);
+          break;
+        case SceneryElement::Wave2:
+          Sprites::drawSelfMasked(sceneryItems[x].x, sceneryItems[x].y, wave_02, 0);
+          break;
+
+        case SceneryElement::Boat:
+          Sprites::drawSelfMasked(sceneryItems[x].x, sceneryItems[x].y, sail_boat, 0);
+          break;
+
+      }
+
+    }
+
+
+    // Draw ground ..
+
+    for (uint8_t x = 0; x < NUMBER_OF_SCENERY_TILES; x++) {
+
+      if (lowerSceneryInfo[x].tile > 0) {
+
+        Sprites::drawSelfMasked(-sceneryOffset + (SCENERY_TILE_WIDTH * x), upperSceneryInfo[x].offset - 28, pgm_read_word_near(&upper_scenery_images[upperSceneryInfo[x].tile]), 0);
+        Sprites::drawSelfMasked(-sceneryOffset + (SCENERY_TILE_WIDTH * x), HEIGHT + lowerSceneryInfo[x].offset, pgm_read_word_near(&lower_scenery_images[lowerSceneryInfo[x].tile]), 0);
+
+      }
+
+    }
+  
+  
+
+    if (frame == 0) {
+
+
+      // Update scenery element positions ..
+
+      for (uint8_t x = 0; x < NUMBER_OF_SCENERY_ITEMS; x++) {
+
+        sceneryItems[x].x--;
+
+        if (sceneryItems[x].x < -48 && gameState != STATE_GAME_END_OF_MISSION) {
+
+          sceneryItems[x].x = 144;
+          sceneryItems[x].y = random( 
+                                      clamp(static_cast<int8_t>(4 + upperSceneryInfo[NUMBER_OF_SCENERY_ITEMS - 1].offset), static_cast<int8_t>(0), static_cast<int8_t>(32)), 
+                                      clamp(static_cast<int8_t>(64 + lowerSceneryInfo[NUMBER_OF_SCENERY_ITEMS - 1].offset), static_cast<int8_t>(32), static_cast<int8_t>(48)) 
+                                    );
+          sceneryItems[x].element = static_cast<SceneryElement>(random(0, 3));
+
+        }
+
+      }
+
+
+      // Update ground positions ..
+
+      sceneryOffset++;
+
+      if (sceneryOffset == SCENERY_TILE_WIDTH) {
+        
+
+        // Shuffle the scenery across ..
+Serial.print(sceneryLower);
+Serial.print(" [");
+        sceneryOffset = 0;
+        for (uint8_t x = 0; x < NUMBER_OF_SCENERY_TILES - 1; x++) {
+          upperSceneryInfo[x] = upperSceneryInfo[x + 1];
+          lowerSceneryInfo[x] = lowerSceneryInfo[x + 1];
+Serial.print(lowerSceneryInfo[x].offset);
+Serial.print(",");
+Serial.print(lowerSceneryInfo[x].tile);
+Serial.print(" ");
+        }
+  
+Serial.print("] ");
+        
+
+        // Choose a new lower tile ..
+
+        uint8_t updateTile = NUMBER_OF_SCENERY_TILES - 1;
+
+        {
+          uint8_t minimum = 0;
+          uint8_t maximum = 0;
+          int8_t offset = lowerSceneryInfo[updateTile].offset;
+  
+          switch (sceneryLower) {
+
+            case SCENERY_LOWER_NONE:
+            case SCENERY_LOWER_INCR:
+              if (offset <= SCENERY_LOWER_OFFSET_MAX_MINUS_INC) {
+                minimum = SCENERY_TILE_INCR;
+                maximum = SCENERY_TILE_INCR + 1;
+              }
+              else {
+                minimum = SCENERY_TILE_FLAT_BEGIN;
+                maximum = SCENERY_TILE_FLAT_END + 1;
+              }
+              break;
+
+            case SCENERY_LOWER_DECR:
+              if (offset >= SCENERY_LOWER_OFFSET_MIN_PLUS_INC) {
+                minimum = SCENERY_TILE_DECR;
+                maximum = SCENERY_TILE_DECR + 1;
+              }
+              else {
+                minimum = SCENERY_TILE_FLAT_BEGIN;
+                maximum = SCENERY_TILE_FLAT_END + 1;
+              }            
+              break;
+
+            case SCENERY_LOWER_RAND:
+              minimum = (offset >= SCENERY_LOWER_OFFSET_MIN_PLUS_INC  ? SCENERY_TILE_DECR : SCENERY_TILE_FLAT_BEGIN);
+              maximum = (offset <= SCENERY_LOWER_OFFSET_MAX_MINUS_INC ? SCENERY_TILE_INCR : SCENERY_TILE_FLAT_END) + 1;
+              break;
+
+          }
+
+          uint8_t newTile = random(minimum, maximum);
+          lowerSceneryInfo[updateTile].tile = newTile;
+          lowerSceneryInfo[updateTile].offset = offset + lower_offsets[getOffsetsIndex(newTile, lowerSceneryInfo[updateTile - 1].tile)];
+
+       
+
+          switch (newTile) {
+
+            case SCENERY_TILE_INCR:
+              switch (lowerSceneryInfo[updateTile - 1].tile) {
+                case SCENERY_TILE_INCR:
+  Serial.print(".a0.");
+//                  upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 4;
+                  break;
+                case SCENERY_TILE_DECR:
+  Serial.print(".b0.");
+//                  upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 4;
+                  break;
+                default:
+  Serial.print(".c0.");
+//                  upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 4;
+                  break;
+              }
+              break;
+
+            case SCENERY_TILE_DECR:
+              switch (upperSceneryInfo[updateTile - 1].tile) {
+                case SCENERY_TILE_INCR:
+  Serial.print(".a1.");
+  //                upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 0;
+                  break;
+                case SCENERY_TILE_DECR:
+  Serial.print(".b1.");
+  //                upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset - 4;
+                  break;
+                default:
+  Serial.print(".c1.");
+  //                upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset - 0;
+                  break;
+              }
+              break;
+
+            default:
+              switch (upperSceneryInfo[updateTile - 1].tile) {
+                case SCENERY_TILE_INCR:
+  Serial.print(".a2.");
+ //               upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 0;
+                  break;
+                case SCENERY_TILE_DECR:
+  Serial.print(".b2.");
+ //                 upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset -4;
+                  break;
+                default:
+  Serial.print(".c2.");
+ //                 upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 0;
+                  break;
+              }
+              break;
+          }
+
+
+
+        }
+        
+
+        // Choose a new upper tile ..
+
+        {
+          uint8_t minimum = 0;
+          uint8_t maximum = 0;
+          int8_t offset = upperSceneryInfo[updateTile].offset;
+  
+          switch (sceneryUpper) {
+
+            case SCENERY_UPPER_INCR:
+              if (offset <= SCENERY_UPPER_OFFSET_MAX_MINUS_INC) {
+                minimum = SCENERY_TILE_INCR;
+                maximum = SCENERY_TILE_INCR + 1;
+              }
+              else {
+                minimum = SCENERY_TILE_FLAT_BEGIN;
+                maximum = SCENERY_TILE_FLAT_END + 1;
+              }
+              break;
+
+            case SCENERY_UPPER_NONE:
+            case SCENERY_UPPER_DECR:
+              if (offset >= SCENERY_LOWER_OFFSET_MIN_PLUS_INC) {
+                minimum = SCENERY_TILE_DECR;
+                maximum = SCENERY_TILE_DECR + 1;
+              }
+              else {
+                minimum = SCENERY_TILE_FLAT_BEGIN;
+                maximum = SCENERY_TILE_FLAT_END + 1;
+              }            
+              break;
+
+            case SCENERY_UPPER_RAND:
+              minimum = (offset >= SCENERY_LOWER_OFFSET_MIN_PLUS_INC  ? SCENERY_TILE_DECR : SCENERY_TILE_FLAT_BEGIN);
+              maximum = (offset <= SCENERY_LOWER_OFFSET_MAX_MINUS_INC ? SCENERY_TILE_INCR : SCENERY_TILE_FLAT_END) + 1;
+              break;
+
+          }
+  // Serial.print(" min: ");
+  // Serial.print(minimum);
+  // Serial.print(",max: ");
+  // Serial.print(maximum);
+  // Serial.print(", rand ");
+          uint8_t newTile = random(minimum, maximum);
+  // Serial.print(newTile);
+  // Serial.print(" ");
+
+
+
+          upperSceneryInfo[updateTile].tile = newTile;
+          upperSceneryInfo[updateTile].offset = offset + upper_offsets[getOffsetsIndex(newTile, upperSceneryInfo[updateTile - 1].tile)];
+        
+/*
+          switch (newTile) {
+
+            case SCENERY_TILE_INCR:
+              switch (upperSceneryInfo[updateTile - 1].tile) {
+                case SCENERY_TILE_INCR:
+  Serial.print(".a0.");
+//                  upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 4;
+                  break;
+                case SCENERY_TILE_DECR:
+  Serial.print(".b0.");
+//                  upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 4;
+                  break;
+                default:
+  Serial.print(".c0.");
+//                  upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 4;
+                  break;
+              }
+              break;
+
+            case SCENERY_TILE_DECR:
+              switch (upperSceneryInfo[updateTile - 1].tile) {
+                case SCENERY_TILE_INCR:
+  Serial.print(".a1.");
+  //                upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 0;
+                  break;
+                case SCENERY_TILE_DECR:
+  Serial.print(".b1.");
+  //                upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset - 4;
+                  break;
+                default:
+  Serial.print(".c1.");
+  //                upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset - 0;
+                  break;
+              }
+              break;
+
+            default:
+              switch (upperSceneryInfo[updateTile - 1].tile) {
+                case SCENERY_TILE_INCR:
+  Serial.print(".a2.");
+ //               upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 0;
+                  break;
+                case SCENERY_TILE_DECR:
+  Serial.print(".b2.");
+ //                 upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset -4;
+                  break;
+                default:
+  Serial.print(".c2.");
+ //                 upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 0;
+                  break;
+              }
+              break;
+          }
+*/
+        }
+
+
+// Serial.println(upperSceneryInfo[updateTile].offset);
+
+      }
+
+    }
+
+}
+
+
+uint8_t getOffsetsIndex(uint8_t newTile, uint8_t oldTile) {
+
+  uint8_t index = 0;
+
+  switch (newTile) {
+
+    case SCENERY_TILE_INCR:   
+      index = 6;
+      break;
+
+    case SCENERY_TILE_DECR:   
+      index = 0;
+      break;
+
+    default:                  
+      index = 3;
+      break;
+
+  }
+
+  switch (oldTile) {
+
+    case SCENERY_TILE_INCR:   
+      index = index + 2;
+      break;
+
+    case SCENERY_TILE_DECR:   
+      break;
+
+    default:                  
+      index = index + 1;
+      break;
+
+  }
+
+  return index;
+
+}
+#endif
 
 
 /* ----------------------------------------------------------------------------
@@ -1745,124 +1912,3 @@ uint16_t EEPROMReadInt(int address) {
   return ((lowByte << 0) & 0xFF) + ((highByte << 8) & 0xFF00);
 
 }
-
-
-#ifdef HAS_SCENERY
-void renderScenery() {
-
-    // Draw ground ..
-
-    for (uint8_t x = 0; x < NUMBER_OF_SCENERY_TILES; x--) {
-
-      if (upperSceneryInfo[x].tile > 0) {
-        Sprites::drawOverwrite(-sceneryOffset + (SCENERY_TILE_WIDTH * x), upperSceneryInfo[x].offset, upper_scenery_images[x], 0);
-      }
-
-      if (lowerSceneryInfo[x].tile > 0) {
-        Sprites::drawOverwrite(-sceneryOffset + (SCENERY_TILE_WIDTH * x), HEIGHT + lowerSceneryInfo[x].offset, lower_scenery_images[x], 0);
-      }
-
-    }
-  
-    Sprites::drawOverwrite(sailboatX, sailboatY, Sail_Boat, 0);
-
-    if (arduboy.everyXFrames(2)) {
-
-      sceneryOffset++;
-
-      if (sceneryOffset == SCENERY_TILE_WIDTH) {
-        
-
-        // Shuffle the scenery across ..
-
-        sceneryOffset = 0;
-        for (uint8_t x = 0; x < NUMBER_OF_SCENERY_TILES - 1; x--) {
-          upperSceneryInfo[x] = upperSceneryInfo[x + 1];
-          lowerSceneryInfo[x] = lowerSceneryInfo[x + 1];
-        }
-
-
-        // Choose a new upper tile ..
-
-        uint8_t updateTile = NUMBER_OF_SCENERY_TILES - 1;
-
-        switch (sceneryUpper) {
-
-          case SCENERY_UPPER_NONE:
-          case SCENERY_UPPER_DECR:
-            if (lowerSceneryInfo[updateTile].offset < 24) {
-              lowerSceneryInfo[updateTile].offset++;
-              lowerSceneryInfor[updateTile].tile = random(1, 4);
-            }
-            else {
-              lowerSceneryInfor[updateTile].tile = 0;
-            }
-            break;
-
-          case SCENERY_UPPER_INCR:
-            lowerSceneryInfor[updateTile].tile = random(1, 4);
-            if (lowerSceneryInfo[updateTile].offset > -24) {
-              lowerSceneryInfo[updateTile].offset--;
-            }
-            break;
-
-          case SCENERY_UPPER_FULL:
-            {
-              int8_t minimum = (lowerSceneryInfo[updateTile].offset > -24 ? -1 : 0);
-              int8_t maximum = (lowerSceneryInfo[updateTile].offset < 24 ? 2 : 1);
-              
-              lowerSceneryInfor[updateTile].tile = random(1, 4);
-              lowerSceneryInfor[updateTile].offset = lowerSceneryInfor[updateTile].offset + random(minimum, maximum);
-            }
-            break;
-
-        }
-        
-
-        // Choose a new lower tile ..
-
-        switch (sceneryLower) {
-
-          case SCENERY_LOWER_NONE:
-          case SCENERY_LOWER_DECR:
-            if (lowerSceneryInfo[updateTile].offset < 24) {
-              lowerSceneryInfo[updateTile].offset++;
-              lowerSceneryInfo[updateTile].tile = random(1, 4);
-            }
-            else {
-              lowerSceneryInfor[updateTile].tile = 0;
-            }
-            break;
-
-          case SCENERY_LOWER_INCR:
-            lowerSceneryInfo[updateTile].tile = random(1, 4);
-            if (lowerSceneryInfo[updateTile].offset > -24) {
-              lowerSceneryInfo[updateTile].offset--;
-            }
-            break;
-
-          case SCENERY_LOWER_FULL:
-            {
-              int8_t minimum = (lowerSceneryInfo[updateTile].offset > -24 ? -1 : 0);
-              int8_t maximum = (lowerSceneryInfo[updateTile].offset < 24 ? 2 : 1);
-              
-              lowerSceneryInfo[updateTile].tile = random(1, 4);
-              lowerSceneryInfo[updateTile].offset = lowerSceneryInfo[updateTile].offset + random(minimum, maximum);
-            }
-            break;
-
-        }
-
-      }
-
-      sailboatX--;
-      if (sailboatX == -40) {
-        sailboatX = random(128, 250);
-        sailboatY = random(0, 32);
-      }
-    }
-
-}
-#endif
-
-

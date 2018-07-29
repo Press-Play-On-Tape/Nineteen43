@@ -2,13 +2,16 @@
 
 #include "FixedPoints.h"
 #include "FixedPointsCommon.h"
-#include <Arduboy2.h>
+#include "Arduboy2Ext.h"
 
 
 //#define ORIENTATION_HORIZONTAL
 #define ORIENTATION_VERTICAL
 #define PLANES_HAVE_BORDERS
 #define HAS_SCENERY
+#define SAVE_MEMORY
+#define HAS_CREDITS 
+// Credits 296 bytes
 
 
 // Game States ..
@@ -161,6 +164,18 @@ struct SceneryInfo {
   int8_t offset;
   uint8_t tile;
 };
+
+enum class SceneryElement : uint8_t {
+  Boat,
+  Wave1,
+  Wave2
+};
+
+struct SceneryItem {
+  int16_t x;
+  uint8_t y;
+  SceneryElement element;
+};
 #endif
 
 enum class EnemyType : uint8_t {
@@ -272,3 +287,13 @@ void extractDigits(uint8_t (&buffer)[size], uint16_t value) {
   }
 
 }
+
+// ----------------------------------------------------------------------------
+//  Clamp the value into a range .. 
+//
+template<typename T> T clamp(const T & v, const T & min, const T & max) {
+  
+  return (v < min) ? min : (v > max ? max : v);
+
+}
+
