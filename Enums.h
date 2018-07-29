@@ -5,13 +5,15 @@
 #include "Arduboy2Ext.h"
 
 
-//#define ORIENTATION_HORIZONTAL
+#define _ORIENTATION_HORIZONTAL
 #define ORIENTATION_VERTICAL
 #define PLANES_HAVE_BORDERS
 #define HAS_SCENERY
+#define HAS_SCENERY_ITEMS
 #define SAVE_MEMORY
 #define HAS_CREDITS 
 // Credits 296 bytes
+#define _MEASURE_MEMORY
 
 
 // Game States ..
@@ -160,22 +162,24 @@
 #define ROTATE_Q2_MAX                   (SQ15x16)999
 
 #ifdef HAS_SCENERY
-struct SceneryInfo {
-  int8_t offset;
-  uint8_t tile;
-};
 
-enum class SceneryElement : uint8_t {
-  Boat,
-  Wave1,
-  Wave2
-};
+  struct SceneryInfo {
+    int8_t offset;
+    uint8_t tile;
+  };
 
-struct SceneryItem {
-  int16_t x;
-  uint8_t y;
-  SceneryElement element;
-};
+  enum class SceneryElement : uint8_t {
+    Boat,
+    Wave1,
+    Wave2
+  };
+
+  struct SceneryItem {
+    int16_t x;
+    uint8_t y;
+    SceneryElement element;
+  };
+
 #endif
 
 enum class EnemyType : uint8_t {

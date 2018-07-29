@@ -20,8 +20,8 @@ void endOfMission() {
     
     arduboy.setCursor(11, 10);
     arduboy.print(F("Mission Successful"));
-    drawHorizontalDottedLine(9, 118, 7, WHITE);
-    drawHorizontalDottedLine(9, 118, 19, WHITE);
+    arduboy.drawHorizontalDottedLine(9, 118, 7, WHITE);
+    arduboy.drawHorizontalDottedLine(9, 118, 19, WHITE);
     gameState = STATE_GAME_INIT;
 
     arduboy.fillRect(i - 2, 5, 255, 20, BLACK);
@@ -55,8 +55,8 @@ void endOfMission() {
   arduboy.print(F("A Continue"));
 
   
-  drawHorizontalDottedLine(34, 38, 53, WHITE);
-  drawHorizontalDottedLine(34, 38, 63, WHITE);
+  arduboy.drawHorizontalDottedLine(34, 38, 53, WHITE);
+  arduboy.drawHorizontalDottedLine(34, 38, 63, WHITE);
 
   arduboy.display();
 
@@ -93,8 +93,8 @@ void endOfGame() {
   arduboy.print(F("Game"));
   arduboy.setCursor(101, 4);
   arduboy.print(F("Over"));
-  drawHorizontalDottedLine(72, 124, 2, BLACK);
-  drawHorizontalDottedLine(72, 124, 12, BLACK);
+  arduboy.drawHorizontalDottedLine(72, 124, 2, BLACK);
+  arduboy.drawHorizontalDottedLine(72, 124, 12, BLACK);
   
   if (playerScore > high) {
     EEPROMWriteInt(EEPROM_SCORE + (level * 2), playerScore);

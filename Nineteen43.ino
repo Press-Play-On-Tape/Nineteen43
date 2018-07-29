@@ -23,6 +23,10 @@
 #include "Images/Images_Scenery.h"
 #include "Images/Images_Arrays.h"
 
+#ifdef MEASURE_MEMORY
+#include "MemoryFree.h"
+#endif
+
 #ifdef HAS_SCENERY
 #include "Images/Images_Scenery.h"
 #endif
@@ -109,11 +113,14 @@ SQ7x8 obstacleFuelValue = FUEL_MAX;
   SceneryInfo lowerSceneryInfo[NUMBER_OF_SCENERY_TILES];
   uint8_t sceneryOffset;
 
+  #ifdef HAS_SCENERY_ITEMS
   SceneryItem sceneryItems[NUMBER_OF_SCENERY_ITEMS];
+  #endif
 
 #endif
 
 #ifdef HAS_SCENERY
+#ifdef HAS_SCENERY_ITEMS
 void initSceneryItems() {
   sceneryItems[0] = { 128, 20, SceneryElement::Boat};
   sceneryItems[1] = { 176, 25, SceneryElement::Wave1};
@@ -121,7 +128,7 @@ void initSceneryItems() {
   sceneryItems[3] = { 272, 35, SceneryElement::Wave1};
 }
 #endif
-
+#endif
 
 
 /* -----------------------------------------------------------------------------------------------------------------------------
@@ -157,6 +164,11 @@ void setup() {
 void loop() {
 
   if (!(arduboy.nextFrame())) return;
+
+  #ifdef MEASURE_MEMORY 
+  Serial.println(freeMemory());
+  #endif
+
   arduboy.clear();
   arduboy.pollButtons();
 
@@ -268,8 +280,8 @@ void credits_loop() {
       
       arduboy.setCursor(44, 10);
       arduboy.print(F("Credits"));
-      drawHorizontalDottedLine(20, 107, 7, WHITE);
-      drawHorizontalDottedLine(20, 107, 19, WHITE);
+      arduboy.drawHorizontalDottedLine(20, 107, 7, WHITE);
+      arduboy.drawHorizontalDottedLine(20, 107, 19, WHITE);
       gameState = STATE_INTRO_INIT;
       
       arduboy.fillRect(i - 2, 5, 255, 20, BLACK);
@@ -553,12 +565,17 @@ void gameLoop() {
   switch (intro) {
 
     case 80: 
-      initSceneryItems();
 
-      for (uint8_t x = 0; x < NUMBER_OF_SCENERY_TILES; x++) {
-        upperSceneryInfo[x].offset = 0;
-        lowerSceneryInfo[x].offset = 0;
-      }
+      #ifdef HAS_SCENERY
+        #ifdef HAS_SCENERY_ITEMS
+          initSceneryItems();
+        #endif
+
+        for (uint8_t x = 0; x < NUMBER_OF_SCENERY_TILES; x++) {
+          upperSceneryInfo[x].offset = 0;
+          lowerSceneryInfo[x].offset = 0;
+        }
+      #endif
 
     case 2 ... 79:
 
@@ -569,8 +586,8 @@ void gameLoop() {
         arduboy.setTextColor(WHITE);
         arduboy.print(F("Mission "));
         arduboy.print(mission + 1);
-        drawHorizontalDottedLine(35 + offsetX, offsetL, 26, WHITE);
-        drawHorizontalDottedLine(35 + offsetX, offsetL, 38, WHITE);
+        arduboy.drawHorizontalDottedLine(35 + offsetX, offsetL, 26, WHITE);
+        arduboy.drawHorizontalDottedLine(35 + offsetX, offsetL, 38, WHITE);
 
       #endif
 
@@ -703,7 +720,11 @@ void gameLoop() {
     if (newFormation) {
 
       if (mission_formations_left > 0) {
-  
+
+Serial.print(mission_formations_left);
+Serial.print(" ");
+Serial.println(mission % NUMBER_OF_MISSIONS);
+
         launchMission_NextFormation(missions[mission % NUMBER_OF_MISSIONS]);
   
       }
@@ -846,7 +867,7 @@ void launchMission_FirstFormation(const uint8_t *mission) {
     sceneryLower = formationPlusScenery & SCENERY_MASK_LOWER;
   }
   #else
-  formation = pgm_read_byte(&mission[missionIdx++]);
+    formation = pgm_read_byte(&mission[missionIdx++]);
   #endif
 
   launchFormation(formations[formation]);
@@ -879,7 +900,7 @@ void launchMission_NextFormation(const uint8_t *mission) {
     sceneryLower = formationPlusScenery & SCENERY_MASK_LOWER;
   }
   #else
-  formation = pgm_read_byte(&mission[missionIdx++]);
+    formation = pgm_read_byte(&mission[missionIdx++]);
   #endif
 
   launchFormation(formations[formation]);
@@ -1385,10 +1406,8 @@ void renderEndOfMission() {
 
   for (uint8_t i = 0; i < 128; ++i) {
 
-//    arduboy.clear();
-
-    #ifdef ORIENTATION_VERTICAL
-    renderScenery((arduboy.getFrameCount(2) + i) % 2);
+    #ifdef HAS_SCENERY
+    renderScenery(i % 2);
     #endif
 
 #ifndef PLANES_HAVE_BORDERS
@@ -1396,6 +1415,7 @@ void renderEndOfMission() {
 #else
     Sprites::drawExternalMask(player.getX().getInteger() + i, player.getY().getInteger(), p38_0, p38_mask_0, 0, 0);
 #endif
+
     renderScoreboard();
     arduboy.display(true);
     delay(20);
@@ -1522,7 +1542,7 @@ void initEEPROM(bool forceOverwrite) {
 #define SCENERY_UPPER_OFFSET_MAX_MINUS_INC 20       
 #define SCENERY_UPPER_OFFSET_MAX SCENERY_UPPER_OFFSET_MAX_MINUS_INC + 4
 
-const int8_t lower_offsets[] = { -4, -4, 0,   0, 0, 4,    4, 0, 4 };
+const int8_t lower_offsets[] = { -4, -4, 0,   0, 0, 4,    0, 0, 4 };
 const int8_t upper_offsets[] = { -4, 0, 0,   -4, 0, 0,    4, 4, 4 };
 
 
@@ -1531,6 +1551,7 @@ void renderScenery(uint8_t frame) {
 
     // Draw scenery elements ..
 
+    #ifdef HAS_SCENERY_ITEMS
     for (uint8_t x = 0; x < NUMBER_OF_SCENERY_ITEMS; x++) {
 
       switch (sceneryItems[x].element) {
@@ -1549,15 +1570,21 @@ void renderScenery(uint8_t frame) {
       }
 
     }
+    #endif
 
 
     // Draw ground ..
 
     for (uint8_t x = 0; x < NUMBER_OF_SCENERY_TILES; x++) {
 
-      if (lowerSceneryInfo[x].tile > 0) {
+      if (upperSceneryInfo[x].tile > 0) {
 
         Sprites::drawSelfMasked(-sceneryOffset + (SCENERY_TILE_WIDTH * x), upperSceneryInfo[x].offset - 28, pgm_read_word_near(&upper_scenery_images[upperSceneryInfo[x].tile]), 0);
+
+      }
+
+      if (lowerSceneryInfo[x].tile > 0) {
+
         Sprites::drawSelfMasked(-sceneryOffset + (SCENERY_TILE_WIDTH * x), HEIGHT + lowerSceneryInfo[x].offset, pgm_read_word_near(&lower_scenery_images[lowerSceneryInfo[x].tile]), 0);
 
       }
@@ -1571,6 +1598,7 @@ void renderScenery(uint8_t frame) {
 
       // Update scenery element positions ..
 
+      #ifdef HAS_SCENERY_ITEMS
       for (uint8_t x = 0; x < NUMBER_OF_SCENERY_ITEMS; x++) {
 
         sceneryItems[x].x--;
@@ -1587,6 +1615,7 @@ void renderScenery(uint8_t frame) {
         }
 
       }
+      #endif
 
 
       // Update ground positions ..
@@ -1652,13 +1681,18 @@ Serial.print("] ");
               break;
 
           }
+Serial.print(" min: ");
+Serial.print(minimum);
+Serial.print(",max: ");
+Serial.print(maximum);
+Serial.print(", rand ");     
 
           uint8_t newTile = random(minimum, maximum);
           lowerSceneryInfo[updateTile].tile = newTile;
           lowerSceneryInfo[updateTile].offset = offset + lower_offsets[getOffsetsIndex(newTile, lowerSceneryInfo[updateTile - 1].tile)];
-
-       
-
+  
+  Serial.print(newTile);
+  Serial.print(" ");
           switch (newTile) {
 
             case SCENERY_TILE_INCR:
@@ -1669,7 +1703,7 @@ Serial.print("] ");
                   break;
                 case SCENERY_TILE_DECR:
   Serial.print(".b0.");
-//                  upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 4;
+//                  upperSceneryInfo[updateTile].offset = upperSceneryInfo[updateTile].offset + 0;
                   break;
                 default:
   Serial.print(".c0.");
@@ -1712,7 +1746,7 @@ Serial.print("] ");
               }
               break;
           }
-
+ Serial.println(upperSceneryInfo[updateTile].offset);
 
 
         }
