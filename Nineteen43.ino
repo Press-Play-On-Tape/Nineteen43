@@ -1477,13 +1477,6 @@ void renderScoreboadGauge(const uint8_t imageX, const uint8_t imageY, const uint
 
 
 /* ----------------------------------------------------------------------------
- *  Draw a horizontal dotted line. 
- *  
- *  So much nicer than a solid line!
- * ----------------------------------------------------------------------------
- */
-void drawHorizontalDottedLine(uint8_t x1, uint8_t x2, uint8_t y, uint8_t colour) {
-/* ----------------------------------------------------------------------------
  *   Is the EEPROM initialised? 
  *   
  *   Looks for the characters '4' and '3' in the first two bytes of the EEPROM
